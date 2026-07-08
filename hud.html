@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUD — Strata · RegenHub, LCA</title>
+<style>
+/* ─── Tokens ─── */
+:root {
+  --void:#0c0c0c;--ink:#111111;--surface:#161616;--panel:#1e1e1e;--raised:#242424;
+  --border:#333333;--border-dim:#272727;
+  --gold:#c4956a;--gold-20:rgba(196,149,106,.20);--gold-12:rgba(196,149,106,.12);--gold-06:rgba(196,149,106,.06);
+  --parchment:#f0f0f0;--warm:#d0d0d0;--muted:#9a9a9a;--dim:#666666;--ghost:#444444;
+  --ok:#4ade80;--warn:#fbbf24;--err:#ef4444;--info:#8bbfff;--teal:#7ccfb8;--purple:#a78bfa;
+  --mono:'IBM Plex Mono','JetBrains Mono',Consolas,monospace;
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:Inter,system-ui,sans-serif;
+  /* layer palette */
+  --l-ground:#2a2010;--l-ground-fg:#c4956a;
+  --l-sub:#0e1e18;--l-sub-fg:#7ccfb8;
+  --l-l1:#0e1828;--l-l1-fg:#8bbfff;
+  --l-l2:#1a0e28;--l-l2-fg:#a78bfa;
+  --l-view:#1e1428;--l-view-fg:#d8b4fe;
+  /* ops */
+  --op-s-bg:rgba(139,191,255,.12);--op-s-fg:#8bbfff;--op-s-bdr:rgba(139,191,255,.25);
+  --op-i-bg:rgba(74,222,128,.12);--op-i-fg:#4ade80;--op-i-bdr:rgba(74,222,128,.25);
+  --op-u-bg:rgba(251,191,36,.12);--op-u-fg:#fbbf24;--op-u-bdr:rgba(251,191,36,.25);
+  --op-d-bg:rgba(239,68,68,.12);--op-d-fg:#ef4444;--op-d-bdr:rgba(239,68,68,.25);
+}
+[data-theme="light"] {
+  --void:#f7f5f0;--ink:#eeece8;--surface:#ffffff;--panel:#f4f1ec;--raised:#ece9e3;
+  --border:#d8d4cc;--border-dim:#e5e2db;
+  --gold:#a07850;--gold-20:rgba(160,120,80,.20);--gold-12:rgba(160,120,80,.12);--gold-06:rgba(160,120,80,.06);
+  --parchment:#1a1a1a;--warm:#333333;--muted:#666666;--dim:#999999;--ghost:#bbbbbb;
+  --ok:#16a34a;--warn:#d97706;--err:#dc2626;--info:#2563eb;--teal:#0d9488;--purple:#7c3aed;
+  --l-ground:#f5ede0;--l-ground-fg:#a07850;
+  --l-sub:#e0f0ec;--l-sub-fg:#0d9488;
+  --l-l1:#e0ecf8;--l-l1-fg:#2563eb;
+  --l-l2:#ece0f8;--l-l2-fg:#7c3aed;
+  --l-view:#f0e8fc;--l-view-fg:#9333ea;
+  --op-s-bg:rgba(37,99,235,.08);--op-s-fg:#2563eb;--op-s-bdr:rgba(37,99,235,.2);
+  --op-i-bg:rgba(22,163,74,.08);--op-i-fg:#16a34a;--op-i-bdr:rgba(22,163,74,.2);
+  --op-u-bg:rgba(217,119,6,.08);--op-u-fg:#d97706;--op-u-bdr:rgba(217,119,6,.2);
+  --op-d-bg:rgba(220,38,38,.08);--op-d-fg:#dc2626;--op-d-bdr:rgba(220,38,38,.2);
+}
+
+/* ─── Reset ─── */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--void);color:var(--warm);font-family:var(--sans)}
+
+/* ─── HUD Shell ─── */
+.hud {
+  display:grid;
+  grid-template-rows:44px 1fr 30px;
+  grid-template-columns:208px 1fr 256px;
+  height:100dvh;
+  overflow:hidden;
+}
+
+/* ─── Top bar ─── */
+.hud-top {
+  grid-column:1/-1;
+  display:flex;align-items:center;gap:0;
+  background:var(--ink);border-bottom:1px solid var(--border-dim);
+  padding:0 16px;
+  overflow:hidden;
+}
+.hud-brand {
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);white-space:nowrap;flex-shrink:0;
+}
+.hud-divider {color:var(--ghost);margin:0 12px;flex-shrink:0}
+.wave-bar {
+  display:flex;align-items:center;gap:4px;flex-shrink:0;
+}
+.wave {
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
+  color:var(--dim);padding:2px 6px;border-radius:3px;
+  border:1px solid transparent;white-space:nowrap;
+}
+.wave.active {
+  color:var(--gold);background:var(--gold-06);border-color:var(--gold-20);
+}
+.hud-spacer{flex:1}
+.hud-counts {
+  display:flex;gap:12px;align-items:center;flex-shrink:0;
+}
+.hud-count {
+  font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  color:var(--muted);white-space:nowrap;
+}
+.hud-count span {color:var(--parchment);font-weight:600}
+.hud-nav {display:flex;gap:2px;align-items:center;margin:0 12px;flex-shrink:0}
+.hud-nav a {
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px;
+  transition:color .12s,background .12s;white-space:nowrap;
+}
+.hud-nav a:hover{color:var(--gold);background:var(--gold-06)}
+.hud-nav a.active{color:var(--gold);background:var(--gold-12)}
+.theme-btn {
+  background:none;border:1px solid var(--border);color:var(--dim);
+  font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 8px;border-radius:3px;cursor:pointer;flex-shrink:0;
+  transition:border-color .12s,color .12s;
+}
+.theme-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ─── Left panel — Strata ─── */
+.hud-left {
+  grid-row:2;grid-column:1;
+  background:var(--surface);border-right:1px solid var(--border-dim);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.panel-label {
+  font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim);padding:10px 14px 6px;border-bottom:1px solid var(--border-dim);
+  flex-shrink:0;
+}
+.layer-stack {
+  flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:10px 10px;gap:6px;
+}
+.layer {
+  border-radius:5px;padding:8px 10px;flex-shrink:0;
+  border:1px solid transparent;
+}
+.layer-title {
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:600;margin-bottom:4px;
+}
+.layer-sub {
+  font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:6px;
+}
+.layer-tables {
+  display:flex;flex-wrap:wrap;gap:3px;
+}
+.layer-tbl {
+  font-family:var(--mono);font-size:9px;letter-spacing:.04em;
+  padding:2px 6px;border-radius:3px;border:1px solid transparent;
+  cursor:default;
+}
+.layer-ground {background:var(--l-ground);border-color:rgba(196,149,106,.2)}
+.layer-ground .layer-title,.layer-ground .layer-tbl{color:var(--l-ground-fg)}
+.layer-ground .layer-tbl{background:rgba(196,149,106,.1);border-color:rgba(196,149,106,.2)}
+.layer-sub-bg {background:var(--l-sub);border-color:rgba(124,207,184,.15)}
+.layer-sub-bg .layer-title,.layer-sub-bg .layer-tbl{color:var(--l-sub-fg)}
+.layer-sub-bg .layer-tbl{background:rgba(124,207,184,.08);border-color:rgba(124,207,184,.15)}
+.layer-l1 {background:var(--l-l1);border-color:rgba(139,191,255,.15)}
+.layer-l1 .layer-title,.layer-l1 .layer-tbl{color:var(--l-l1-fg)}
+.layer-l1 .layer-tbl{background:rgba(139,191,255,.08);border-color:rgba(139,191,255,.15)}
+.layer-l2 {background:var(--l-l2);border-color:rgba(167,139,250,.15)}
+.layer-l2 .layer-title,.layer-l2 .layer-tbl{color:var(--l-l2-fg)}
+.layer-l2 .layer-tbl{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.15)}
+.layer-view {background:var(--l-view);border-color:rgba(216,180,254,.12)}
+.layer-view .layer-title,.layer-view .layer-tbl{color:var(--l-view-fg)}
+.layer-view .layer-tbl{background:rgba(216,180,254,.06);border-color:rgba(216,180,254,.12)}
+
+/* ─── Center panel — Membrane ─── */
+.hud-center {
+  grid-row:2;grid-column:2;
+  display:flex;flex-direction:column;overflow:hidden;
+  background:var(--void);
+}
+.membrane-header {
+  display:flex;align-items:center;gap:12px;
+  padding:8px 14px;border-bottom:1px solid var(--border-dim);flex-shrink:0;
+  background:var(--surface);
+}
+.membrane-label {
+  font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+}
+.filter-group {display:flex;gap:4px;align-items:center;margin-left:auto}
+.filter-chip {
+  font-family:var(--mono);font-size:9px;letter-spacing:.06em;
+  padding:2px 8px;border-radius:10px;border:1px solid var(--border);
+  background:none;color:var(--dim);cursor:pointer;transition:all .12s;
+}
+.filter-chip:hover,.filter-chip.on{background:var(--gold-12);color:var(--gold);border-color:var(--gold-20)}
+.filter-chip.on-s{background:var(--op-s-bg);color:var(--op-s-fg);border-color:var(--op-s-bdr)}
+.filter-chip.on-i{background:var(--op-i-bg);color:var(--op-i-fg);border-color:var(--op-i-bdr)}
+.filter-chip.on-u{background:var(--op-u-bg);color:var(--op-u-fg);border-color:var(--op-u-bdr)}
+
+.matrix-scroll {flex:1;overflow:auto;padding:0}
+
+.matrix {
+  border-collapse:collapse;width:100%;
+  font-family:var(--mono);font-size:10.5px;
+}
+.matrix th {
+  position:sticky;top:0;z-index:10;
+  background:var(--ink);
+  padding:8px 10px;text-align:left;
+  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+.matrix th.tbl-agents{color:var(--l-l1-fg)}
+.matrix th.tbl-agreements{color:var(--l-l2-fg)}
+.matrix th.tbl-agr_sect{color:var(--l-l2-fg)}
+.matrix th.tbl-resources{color:var(--l-l2-fg)}
+.matrix th.tbl-role_asgn{color:var(--l-l1-fg)}
+.matrix th.tbl-events{color:var(--l-l1-fg)}
+
+.matrix td {
+  padding:5px 10px;border-bottom:1px solid var(--border-dim);
+  vertical-align:middle;white-space:nowrap;
+}
+.matrix tr:hover td{background:var(--gold-06)}
+.matrix td.role-cell {
+  color:var(--warm);font-size:10.5px;letter-spacing:.03em;
+  border-right:1px solid var(--border-dim);min-width:120px;
+}
+.role-group-row td {
+  font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim);padding:10px 10px 4px;background:var(--surface);
+  border-bottom:none;
+}
+.ecotype {
+  font-size:8.5px;color:var(--dim);display:block;margin-top:1px;
+}
+.ops {display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.op {
+  font-size:8.5px;letter-spacing:.04em;
+  padding:1px 5px;border-radius:3px;border:1px solid;
+  line-height:1.4;font-weight:600;
+}
+.op-S{background:var(--op-s-bg);color:var(--op-s-fg);border-color:var(--op-s-bdr)}
+.op-I{background:var(--op-i-bg);color:var(--op-i-fg);border-color:var(--op-i-bdr)}
+.op-U{background:var(--op-u-bg);color:var(--op-u-fg);border-color:var(--op-u-bdr)}
+.op-D{background:var(--op-d-bg);color:var(--op-d-fg);border-color:var(--op-d-bdr)}
+.op-own{
+  font-size:7.5px;letter-spacing:.02em;
+  padding:1px 4px;border-radius:3px;border:1px solid var(--border);
+  color:var(--dim);background:transparent;line-height:1.4;
+}
+.cell-none{color:var(--ghost);font-size:12px;padding-left:2px}
+
+.legend-bar {
+  display:flex;align-items:center;gap:14px;padding:6px 14px;
+  background:var(--ink);border-top:1px solid var(--border-dim);flex-shrink:0;
+  font-family:var(--mono);font-size:9px;
+}
+.legend-item{display:flex;align-items:center;gap:5px;color:var(--dim)}
+
+/* ─── Right panel — Ground ─── */
+.hud-right {
+  grid-row:2;grid-column:3;
+  background:var(--surface);border-left:1px solid var(--border-dim);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.right-tabs {
+  display:flex;border-bottom:1px solid var(--border-dim);flex-shrink:0;
+}
+.right-tab {
+  flex:1;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);padding:8px;text-align:center;cursor:pointer;border:none;
+  background:none;border-bottom:2px solid transparent;transition:all .12s;
+}
+.right-tab.active,.right-tab:hover{color:var(--gold);border-bottom-color:var(--gold)}
+.right-content{flex:1;overflow-y:auto}
+
+/* Policies tab */
+.policy-group {padding:8px 12px 4px;border-bottom:1px solid var(--border-dim)}
+.policy-group:last-child{border-bottom:none}
+.policy-group-label {
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;
+  margin-bottom:6px;display:flex;align-items:center;gap:6px;
+}
+.policy-row {
+  display:flex;align-items:flex-start;gap:6px;padding:3px 0;
+  border-bottom:1px solid var(--border-dim);
+}
+.policy-row:last-child{border-bottom:none}
+.policy-op {
+  font-family:var(--mono);font-size:8px;padding:1px 4px;border-radius:3px;
+  border:1px solid;flex-shrink:0;margin-top:1px;font-weight:600;line-height:1.4;letter-spacing:.04em;
+}
+.policy-name {font-family:var(--mono);font-size:9.5px;color:var(--muted);line-height:1.5;word-break:break-all}
+.policy-cite {
+  font-family:var(--mono);font-size:8px;color:var(--dim);margin-top:1px;
+}
+
+/* Bylaws tab */
+.bylaw-row {
+  padding:5px 12px;border-bottom:1px solid var(--border-dim);
+  display:flex;align-items:baseline;gap:8px;
+}
+.bylaw-row:last-child{border-bottom:none}
+.bylaw-addr {
+  font-family:var(--mono);font-size:9px;color:var(--gold);flex-shrink:0;width:36px;
+}
+.bylaw-name {font-size:11px;color:var(--muted);line-height:1.5}
+.bylaw-block {
+  font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:3px;
+  color:var(--err);background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);
+  flex-shrink:0;margin-left:auto;
+}
+
+/* Migrations tab */
+.migration-row {
+  padding:8px 12px;border-bottom:1px solid var(--border-dim);
+}
+.migration-row:last-child{border-bottom:none}
+.migration-id {font-family:var(--mono);font-size:9px;color:var(--gold);margin-bottom:3px}
+.migration-label {font-size:11px;color:var(--warm);margin-bottom:3px}
+.migration-meta {font-family:var(--mono);font-size:8.5px;color:var(--dim)}
+.wave-badge {
+  display:inline-block;font-family:var(--mono);font-size:8px;letter-spacing:.08em;
+  padding:1px 6px;border-radius:3px;margin-right:6px;
+}
+.wave-applied{color:var(--ok);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2)}
+.wave-planned{color:var(--dim);background:transparent;border:1px solid var(--border)}
+
+/* ─── Bottom bar ─── */
+.hud-bottom {
+  grid-column:1/-1;
+  display:flex;align-items:center;gap:16px;
+  background:var(--ink);border-top:1px solid var(--border-dim);
+  padding:0 16px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.08em;
+  overflow:hidden;
+}
+.bot-item{color:var(--dim);white-space:nowrap}
+.bot-item span{color:var(--muted)}
+.bot-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.dot-ok{background:var(--ok)}
+.dot-warn{background:var(--warn)}
+.bot-spacer{flex:1}
+.bot-blockers {
+  font-family:var(--mono);font-size:9px;color:var(--warn);
+  padding:2px 8px;border-radius:3px;background:rgba(251,191,36,.08);
+  border:1px solid rgba(251,191,36,.2);white-space:nowrap;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--ghost)}
+</style>
+</head>
+<body>
+<div class="hud">
+
+<!-- ═══ TOP BAR ═══ -->
+<header class="hud-top">
+  <span class="hud-brand">Strata</span>
+  <span class="hud-divider">·</span>
+  <span class="hud-brand" style="color:var(--muted);font-size:10px">RegenHub, LCA</span>
+  <span class="hud-divider">|</span>
+  <div class="wave-bar">
+    <span class="wave active">W0</span>
+    <span class="wave">W1</span>
+    <span class="wave">W2</span>
+    <span class="wave">W3</span>
+    <span class="wave">W4</span>
+    <span class="wave">W5</span>
+    <span class="wave">W6</span>
+  </div>
+  <div class="hud-spacer"></div>
+  <div class="hud-counts">
+    <span class="hud-count"><span>6</span> tables</span>
+    <span class="hud-count"><span>15</span> roles</span>
+    <span class="hud-count"><span>31</span> policies</span>
+    <span class="hud-count"><span>3</span> migrations</span>
+  </div>
+  <nav class="hud-nav">
+    <a href="/">Overview</a>
+    <a href="/schema.html">Schema</a>
+    <a href="/policies.html">Policies</a>
+    <a href="/roles.html">Roles</a>
+    <a href="/bylaws.html">Bylaws</a>
+    <a href="/migrations.html">Migrations</a>
+    <a href="/hud.html" class="active">HUD</a>
+  </nav>
+  <button class="theme-btn" onclick="toggleTheme()">◐</button>
+</header>
+
+<!-- ═══ LEFT — STRATA ═══ -->
+<aside class="hud-left">
+  <div class="panel-label">Strata — layer stack</div>
+  <div class="layer-stack">
+
+    <div class="layer layer-view">
+      <div class="layer-title">Canopy · Views</div>
+      <div class="layer-sub">Read-only projections over living data. What members see without touching root.</div>
+      <div class="layer-tables">
+        <span class="layer-tbl">member_directory</span>
+        <span class="layer-tbl">public_bylaws</span>
+        <span class="layer-tbl">my_contributions</span>
+      </div>
+    </div>
+
+    <div class="layer layer-l2">
+      <div class="layer-title">L2 · Modules</div>
+      <div class="layer-sub">Living tissue — agreements, assets, relationships. Grows from L1 events.</div>
+      <div class="layer-tables">
+        <span class="layer-tbl">agreements</span>
+        <span class="layer-tbl">agreement_sections</span>
+        <span class="layer-tbl">resources</span>
+      </div>
+    </div>
+
+    <div class="layer layer-l1">
+      <div class="layer-title">L1 · Primitives</div>
+      <div class="layer-sub">The root system — what happened, who did it, what role they held. Immutable record.</div>
+      <div class="layer-tables">
+        <span class="layer-tbl">agents</span>
+        <span class="layer-tbl">events</span>
+        <span class="layer-tbl">role_assignments</span>
+      </div>
+    </div>
+
+    <div class="layer layer-sub-bg">
+      <div class="layer-title">Substrate · Membrane</div>
+      <div class="layer-sub">Supabase — Postgres + Auth + RLS. The membrane: 31 policies decide what passes.</div>
+      <div class="layer-tables">
+        <span class="layer-tbl">RLS on</span>
+        <span class="layer-tbl">default-deny</span>
+        <span class="layer-tbl">cite-as-enforce</span>
+      </div>
+    </div>
+
+    <div class="layer layer-ground">
+      <div class="layer-title">Ground · Legal</div>
+      <div class="layer-sub">Colorado ULCAA · IRC Subchapter K · Articles → Bylaws → MA</div>
+      <div class="layer-tables">
+        <span class="layer-tbl">SOS #2026116</span>
+        <span class="layer-tbl">Bylaws v.2</span>
+        <span class="layer-tbl">MA v.2.3</span>
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+<!-- ═══ CENTER — MEMBRANE / MATRIX ═══ -->
+<main class="hud-center">
+  <div class="membrane-header">
+    <span class="membrane-label">Membrane — role × table access</span>
+    <div class="filter-group">
+      <button class="filter-chip" id="f-all" onclick="filterOps('all')">All</button>
+      <button class="filter-chip" id="f-S" onclick="filterOps('S')">SELECT</button>
+      <button class="filter-chip" id="f-I" onclick="filterOps('I')">INSERT</button>
+      <button class="filter-chip" id="f-U" onclick="filterOps('U')">UPDATE</button>
+    </div>
+  </div>
+  <div class="matrix-scroll">
+    <table class="matrix" id="matrix">
+      <thead>
+        <tr>
+          <th style="width:120px">Role</th>
+          <th class="tbl-agents">agents</th>
+          <th class="tbl-agreements">agreements</th>
+          <th class="tbl-agr_sect">agr_sect</th>
+          <th class="tbl-resources">resources</th>
+          <th class="tbl-role_asgn">role_asgn</th>
+          <th class="tbl-events">events</th>
+        </tr>
+      </thead>
+      <tbody id="matrix-body"></tbody>
+    </table>
+  </div>
+  <div class="legend-bar">
+    <span style="font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-right:4px">ops</span>
+    <span class="legend-item"><span class="op op-S">S</span> SELECT</span>
+    <span class="legend-item"><span class="op op-I">I</span> INSERT</span>
+    <span class="legend-item"><span class="op op-U">U</span> UPDATE</span>
+    <span class="legend-item"><span class="op-own" style="font-size:8.5px;padding:1px 5px;border-radius:3px;border:1px solid var(--border);color:var(--dim)">own</span> own record only</span>
+    <span style="margin-left:auto;font-size:9px;color:var(--dim)">RLS default-deny · all unlisted = blocked</span>
+  </div>
+</main>
+
+<!-- ═══ RIGHT — GROUND ═══ -->
+<aside class="hud-right">
+  <div class="right-tabs">
+    <button class="right-tab active" onclick="showTab('policies')">Policies</button>
+    <button class="right-tab" onclick="showTab('bylaws')">Bylaws</button>
+    <button class="right-tab" onclick="showTab('migrations')">Migrations</button>
+  </div>
+  <div class="right-content" id="right-content"></div>
+</aside>
+
+<!-- ═══ BOTTOM BAR ═══ -->
+<footer class="hud-bottom">
+  <div class="bot-dot dot-ok"></div>
+  <span class="bot-item"><span>W0</span> applied — Jul 2026</span>
+  <span class="bot-item">3 migrations · Supabase</span>
+  <span class="bot-item"><span>§18.1</span> 11 coop roles · EE Grant 4 hub roles</span>
+  <div class="bot-spacer"></div>
+  <span class="bot-blockers">⚠ 2 blocking issues — MA v.2.3 + Bylaws v.2</span>
+  <span class="bot-item" style="color:var(--dim)">journal.techne.coop/daybook/cooperative-information-system/</span>
+</footer>
+
+</div><!-- .hud -->
+
+<script>
+/* ─── Data ─── */
+
+const ROLES = [
+  // group, id, label, ecotype, db_role
+  { g:'public',    id:'guest',          label:'Guest',            eco:'seed · pre-entry',       db:'anon' },
+  { g:'threshold', id:'applicant',      label:'Applicant',        eco:'germinating · §4.1',     db:'applicant' },
+  { g:'threshold', id:'hub_visitor',    label:'Hub Visitor',      eco:'edge species · EE',      db:'hub_visitor' },
+  { g:'threshold', id:'hub_applicant',  label:'Hub Applicant',    eco:'germinating · EE',       db:'hub_applicant' },
+  { g:'members',   id:'patron_member',  label:'Patron Member',    eco:'established · §4.2',     db:'patron_member' },
+  { g:'members',   id:'investor_member',label:'Investor Member',  eco:'established · §4.3',     db:'investor_member' },
+  { g:'members',   id:'hub_member',     label:'Hub Member',       eco:'established · EE',       db:'hub_member' },
+  { g:'members',   id:'suspended',      label:'Suspended Member', eco:'dormant · §8.4',         db:'suspended_member' },
+  { g:'members',   id:'former',         label:'Former Member',    eco:'seed bank · §8.5',       db:'former_member' },
+  { g:'governance',id:'director',       label:'Director',         eco:'canopy · §10.1',         db:'director' },
+  { g:'governance',id:'officer',        label:'Officer',          eco:'canopy · §11.1',         db:'officer' },
+  { g:'governance',id:'committee',      label:'Committee Member', eco:'canopy · §12.1',         db:'committee_member' },
+  { g:'governance',id:'ee_liaison',     label:'EE Liaison',       eco:'mycorrhizal · EE',       db:'ee_liaison' },
+  { g:'infrastructure', id:'administrator', label:'Administrator',eco:'root system · §14.1',   db:'administrator' },
+  { g:'infrastructure', id:'nou',       label:'Nou',              eco:'collective perception',  db:'nou_agent' },
+];
+
+const GROUPS = {
+  public:         { label:'Public · unauthenticated', color:'var(--dim)' },
+  threshold:      { label:'Threshold · entering',     color:'var(--teal)' },
+  members:        { label:'Members · established',    color:'var(--gold)' },
+  governance:     { label:'Governance · canopy',      color:'var(--info)' },
+  infrastructure: { label:'Infrastructure · roots',   color:'var(--purple)' },
+};
+
+// [agents, agreements, agr_sect, resources, role_asgn, events]
+// Each value: array of op strings, 'own' means own-record qualifier applies
+const M = {
+  //                  agents          agreements        agr_sect          resources         role_asgn         events
+  guest:          [  [],              ['S'],            ['S'],            [],               [],               []            ],
+  applicant:      [  ['S','U','own'], ['S'],            ['S'],            [],               ['S','own'],      ['S','I','own']],
+  hub_visitor:    [  ['S','U','own'], ['S'],            ['S'],            [],               ['S','own'],      []            ],
+  hub_applicant:  [  ['S','U','own'], ['S'],            ['S'],            [],               ['S','own'],      ['S','I','own']],
+  patron_member:  [  ['S','U','own'], ['S'],            ['S'],            ['S','own'],      ['S','own'],      ['S','I','own']],
+  investor_member:[  ['S','U','own'], ['S'],            ['S'],            ['S','own'],      ['S','own'],      ['S','I','own']],
+  hub_member:     [  ['S','U','own'], ['S'],            ['S'],            ['S','own'],      ['S','own'],      ['S','I','own']],
+  suspended:      [  ['S','own'],     ['S'],            ['S'],            [],               ['S','own'],      []            ],
+  former:         [  ['S','own'],     ['S','own'],      ['S'],            [],               ['S','own'],      []            ],
+  director:       [  ['S','U','own'], ['S','I','U'],    ['S'],            ['S'],            ['S','I','U'],    ['S','I']     ],
+  officer:        [  ['S','U','own'], ['S'],            ['S'],            ['S','own'],      ['S','own'],      ['S','I','own']],
+  committee:      [  ['S','U','own'], ['S'],            ['S'],            ['S','own'],      ['S','own'],      ['S','I','own']],
+  ee_liaison:     [  ['S','U','own'], ['S'],            ['S'],            ['S','own'],      ['S','own'],      ['S','I','own']],
+  administrator:  [  ['S','I','U'],   ['S'],            ['S','I','U'],    ['S','I','U'],    ['S','own'],      ['S','I']     ],
+  nou:            [  ['S','U','own'], ['S'],            ['S'],            ['S','own'],      ['S','own'],      ['S','I']     ],
+};
+
+const TABLES = ['agents','agreements','agr_sect','resources','role_asgn','events'];
+
+const POLICIES = [
+  { table:'agents',          op:'S', name:'agents_own_record_select',              roles:'authenticated',     cite:'§3.1' },
+  { table:'agents',          op:'S', name:'members_read_directory',                roles:'patron_member+',    cite:'§5.2' },
+  { table:'agents',          op:'S', name:'members_read_org_agents',               roles:'patron_member+',    cite:'§5.2' },
+  { table:'agents',          op:'S', name:'admin_reads_all_agents',                roles:'administrator',     cite:'§14.1' },
+  { table:'agents',          op:'I', name:'admin_inserts_agents',                  roles:'administrator',     cite:'§14.1' },
+  { table:'agents',          op:'U', name:'admin_updates_agents',                  roles:'administrator',     cite:'§14.1' },
+  { table:'agents',          op:'U', name:'member_updates_own_agent',              roles:'authenticated',     cite:'§5.3' },
+  { table:'agreements',      op:'S', name:'public_reads_bylaws',                   roles:'everyone',          cite:'§2.1' },
+  { table:'agreements',      op:'S', name:'applicant_reads_member_agreements',     roles:'applicant',         cite:'§4.1' },
+  { table:'agreements',      op:'S', name:'members_read_all_agreements',           roles:'patron_member+',    cite:'§5.2' },
+  { table:'agreements',      op:'S', name:'former_member_reads_own_agreements',    roles:'former_member',     cite:'§8.5' },
+  { table:'agreements',      op:'S', name:'admin_reads_all_agreements',            roles:'administrator',     cite:'§14.1' },
+  { table:'agreements',      op:'I', name:'director_inserts_agreements',           roles:'director',          cite:'§10.2' },
+  { table:'agreements',      op:'U', name:'director_updates_agreements',           roles:'director',          cite:'§10.2' },
+  { table:'agr_sect',        op:'S', name:'public_reads_bylaw_sections',           roles:'everyone',          cite:'§2.1' },
+  { table:'agr_sect',        op:'S', name:'members_read_all_sections',             roles:'patron_member+',    cite:'§5.2' },
+  { table:'agr_sect',        op:'S', name:'applicant_reads_member_agr_sections',   roles:'applicant',         cite:'§4.1' },
+  { table:'agr_sect',        op:'S', name:'admin_reads_all_sections',              roles:'administrator',     cite:'§14.1' },
+  { table:'agr_sect',        op:'I', name:'admin_writes_sections',                 roles:'administrator',     cite:'§14.1' },
+  { table:'agr_sect',        op:'U', name:'admin_updates_sections',                roles:'administrator',     cite:'§14.1' },
+  { table:'resources',       op:'S', name:'members_read_own_resources',            roles:'patron_member+',    cite:'§5.4' },
+  { table:'resources',       op:'S', name:'directors_read_all_resources',          roles:'director',          cite:'§10.3' },
+  { table:'resources',       op:'I', name:'admin_writes_resources',                roles:'administrator',     cite:'§14.1' },
+  { table:'resources',       op:'U', name:'admin_updates_resources',               roles:'administrator',     cite:'§14.1' },
+  { table:'role_asgn',       op:'S', name:'own_role_assignments_select',           roles:'authenticated',     cite:'§3.1' },
+  { table:'role_asgn',       op:'S', name:'directors_read_all_role_assignments',   roles:'director',          cite:'§10.1' },
+  { table:'role_asgn',       op:'I', name:'directors_insert_role_assignments',     roles:'director',          cite:'§10.1' },
+  { table:'role_asgn',       op:'U', name:'directors_update_role_assignments',     roles:'director',          cite:'§10.1' },
+  { table:'events',          op:'S', name:'members_read_own_events',               roles:'authenticated',     cite:'§3.2' },
+  { table:'events',          op:'S', name:'directors_read_all_events',             roles:'director',          cite:'§10.3' },
+  { table:'events',          op:'I', name:'authenticated_insert_events',           roles:'authenticated',     cite:'§3.2' },
+];
+
+const TABLE_COLORS = {
+  agents:'var(--l-l1-fg)', agreements:'var(--l-l2-fg)', agr_sect:'var(--l-l2-fg)',
+  resources:'var(--l-l2-fg)', role_asgn:'var(--l-l1-fg)', events:'var(--l-l1-fg)'
+};
+
+const OP_COLORS = { S:'op-S', I:'op-I', U:'op-U', D:'op-D' };
+
+const BYLAWS = [
+  { addr:'§1',  name:'Name & Formation',             block:false },
+  { addr:'§2',  name:'Public Benefit Purpose',        block:false },
+  { addr:'§3',  name:'Membership — General',          block:false },
+  { addr:'§4',  name:'Admission',                     block:false },
+  { addr:'§5',  name:'Member Rights',                 block:false },
+  { addr:'§6',  name:'Dues & Assessments',            block:false },
+  { addr:'§7',  name:'Meetings',                      block:false },
+  { addr:'§8',  name:'Suspension & Termination',      block:false },
+  { addr:'§9',  name:'Capital & Shares',              block:false },
+  { addr:'§10', name:'Board of Directors',            block:false },
+  { addr:'§11', name:'Officers',                      block:false },
+  { addr:'§12', name:'Committees',                    block:false },
+  { addr:'§13', name:'Patronage & Allocation',        block:false },
+  { addr:'§14', name:'Information Systems',           block:false },
+  { addr:'§15', name:'Records & Transparency',        block:false },
+  { addr:'§16', name:'Fiscal Year & Audit',           block:false },
+  { addr:'§17', name:'Amendments',                    block:false },
+  { addr:'§18', name:'Roles & Identity',              block:true  },
+];
+
+const MIGRATIONS = [
+  { id:'0001', wave:'W0', label:'Initial schema — agents, events, role_assignments', status:'applied', date:'May 2026' },
+  { id:'0002', wave:'W0', label:'L2 modules — agreements, agreement_sections, resources', status:'applied', date:'May 2026' },
+  { id:'0003', wave:'W0', label:'RLS policies — 31 policies, cite-as-enforce', status:'applied', date:'Jun 2026' },
+  { id:'0004', wave:'W1', label:'Patronage events — contribution primitives', status:'planned', date:'' },
+  { id:'0005', wave:'W2', label:'Treasury module — capital accounts', status:'planned', date:'' },
+  { id:'0006', wave:'W3', label:'People module — contact, identity', status:'planned', date:'' },
+  { id:'0007', wave:'W4', label:'Audit log — immutable event stream', status:'planned', date:'' },
+  { id:'0008', wave:'W5', label:'Views — member directory, public bylaws', status:'planned', date:'' },
+  { id:'0009', wave:'W6', label:'Program accounting — K-1 preparation', status:'planned', date:'' },
+];
+
+/* ─── Render matrix ─── */
+function renderCell(ops) {
+  if (!ops || ops.length === 0) return '<span class="cell-none">—</span>';
+  const hasOwn = ops.includes('own');
+  const filtered = ops.filter(o => o !== 'own');
+  const chips = filtered.map(o => `<span class="op op-${o}">${o}</span>`).join('');
+  const ownChip = hasOwn ? '<span class="op-own">own</span>' : '';
+  return `<div class="ops">${chips}${ownChip}</div>`;
+}
+
+function renderMatrix() {
+  const body = document.getElementById('matrix-body');
+  let html = '';
+  let lastGroup = null;
+  for (const role of ROLES) {
+    if (role.g !== lastGroup) {
+      const grp = GROUPS[role.g];
+      html += `<tr class="role-group-row"><td colspan="7" style="color:${grp.color}">${grp.label}</td></tr>`;
+      lastGroup = role.g;
+    }
+    const cells = M[role.id] || TABLES.map(() => []);
+    const cellHtml = cells.map(ops => `<td>${renderCell(ops)}</td>`).join('');
+    html += `<tr data-role="${role.id}">
+      <td class="role-cell">${role.label}<span class="ecotype">${role.eco}</span></td>
+      ${cellHtml}
+    </tr>`;
+  }
+  body.innerHTML = html;
+}
+
+/* ─── Render right panel ─── */
+let currentTab = 'policies';
+
+function renderPolicies() {
+  const groups = {};
+  for (const p of POLICIES) {
+    if (!groups[p.table]) groups[p.table] = [];
+    groups[p.table].push(p);
+  }
+  let html = '';
+  for (const [table, policies] of Object.entries(groups)) {
+    const color = TABLE_COLORS[table] || 'var(--muted)';
+    html += `<div class="policy-group">
+      <div class="policy-group-label" style="color:${color}">${table} <span style="color:var(--dim);font-size:8px">(${policies.length})</span></div>`;
+    for (const p of policies) {
+      const opClass = 'op-' + p.op;
+      html += `<div class="policy-row">
+        <span class="policy-op ${opClass}">${p.op}</span>
+        <div>
+          <div class="policy-name">${p.name}</div>
+          <div class="policy-cite">${p.roles} · <span style="color:var(--gold)">${p.cite}</span></div>
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  return html;
+}
+
+function renderBylaws() {
+  let html = '';
+  for (const b of BYLAWS) {
+    html += `<div class="bylaw-row">
+      <span class="bylaw-addr">${b.addr}</span>
+      <span class="bylaw-name">${b.name}</span>
+      ${b.block ? '<span class="bylaw-block">blocking</span>' : ''}
+    </div>`;
+  }
+  return html;
+}
+
+function renderMigrations() {
+  let html = '';
+  for (const m of MIGRATIONS) {
+    const badge = m.status === 'applied'
+      ? `<span class="wave-badge wave-applied">${m.wave} · applied</span>`
+      : `<span class="wave-badge wave-planned">${m.wave} · planned</span>`;
+    html += `<div class="migration-row">
+      <div class="migration-id">${m.id}</div>
+      <div class="migration-label">${m.label}</div>
+      <div class="migration-meta">${badge}${m.date ? m.date : ''}</div>
+    </div>`;
+  }
+  return html;
+}
+
+function showTab(tab) {
+  currentTab = tab;
+  const content = document.getElementById('right-content');
+  if (tab === 'policies') content.innerHTML = renderPolicies();
+  else if (tab === 'bylaws') content.innerHTML = renderBylaws();
+  else if (tab === 'migrations') content.innerHTML = renderMigrations();
+  document.querySelectorAll('.right-tab').forEach((el, i) => {
+    el.classList.toggle('active', ['policies','bylaws','migrations'][i] === tab);
+  });
+}
+
+/* ─── Filter ─── */
+let activeFilter = 'all';
+function filterOps(op) {
+  activeFilter = op;
+  document.querySelectorAll('.filter-chip').forEach(el => {
+    el.className = 'filter-chip';
+    if (el.id === 'f-' + op) {
+      el.classList.add(op === 'all' ? 'on' : 'on-' + op);
+    }
+  });
+  if (op === 'all') { renderMatrix(); return; }
+  const body = document.getElementById('matrix-body');
+  const rows = body.querySelectorAll('tr[data-role]');
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td:not(.role-cell)');
+    let hasOp = false;
+    cells.forEach(cell => {
+      const chips = cell.querySelectorAll('.op-' + op);
+      if (chips.length > 0) hasOp = true;
+      cell.style.opacity = chips.length > 0 ? '1' : '0.18';
+    });
+    row.style.opacity = hasOp ? '1' : '0.35';
+  });
+}
+
+/* ─── Theme ─── */
+function toggleTheme() {
+  const h = document.documentElement;
+  h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+/* ─── Init ─── */
+renderMatrix();
+showTab('policies');
+document.getElementById('f-all').classList.add('on');
+</script>
+</body>
+</html>
