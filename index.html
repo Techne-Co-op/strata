@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strata — RegenHub, LCA</title>
+<meta name="description" content="The cooperative information system reference. A living record of the database, policies, and roles that govern RegenHub, LCA.">
+<style>
+/* ─── Techne v4 tokens ─── */
+:root {
+  --void: #0c0c0c;
+  --ink: #111111;
+  --surface: #161616;
+  --panel: #1e1e1e;
+  --raised: #242424;
+  --border: #333333;
+  --border-dim: #272727;
+  --gold: #c4956a;
+  --gold-20: rgba(196,149,106,0.20);
+  --gold-12: rgba(196,149,106,0.12);
+  --gold-06: rgba(196,149,106,0.06);
+  --parchment: #f0f0f0;
+  --warm: #d0d0d0;
+  --muted: #9a9a9a;
+  --dim: #666666;
+  --ghost: #444444;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --err: #ef4444;
+  --info: #8bbfff;
+  --teal: #7ccfb8;
+  --purple: #a78bfa;
+  --mono: 'IBM Plex Mono', 'JetBrains Mono', Consolas, monospace;
+  --serif: Georgia, 'Times New Roman', serif;
+  --sans: Inter, system-ui, sans-serif;
+}
+[data-theme="light"] {
+  --void: #f7f5f0;
+  --ink: #eeece8;
+  --surface: #ffffff;
+  --panel: #f4f1ec;
+  --raised: #ece9e3;
+  --border: #d8d4cc;
+  --border-dim: #e5e2db;
+  --gold: #a07850;
+  --gold-20: rgba(160,120,80,0.20);
+  --gold-12: rgba(160,120,80,0.12);
+  --gold-06: rgba(160,120,80,0.06);
+  --parchment: #1a1a1a;
+  --warm: #333333;
+  --muted: #666666;
+  --dim: #999999;
+  --ghost: #bbbbbb;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --err: #dc2626;
+  --info: #2563eb;
+  --teal: #0d9488;
+  --purple: #7c3aed;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--void); color: var(--warm); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+body { min-height: 100vh; }
+
+/* ─── Top bar ─── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--ink);
+  border-bottom: 1px solid var(--border-dim);
+  height: 44px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+}
+.topbar-brand {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold); text-decoration: none;
+}
+.topbar-nav { display: flex; gap: 4px; align-items: center; }
+.topbar-nav a {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted); text-decoration: none;
+  padding: 4px 10px; border-radius: 4px; transition: color 0.13s, background 0.13s;
+}
+.topbar-nav a:hover, .topbar-nav a.active {
+  color: var(--gold); background: var(--gold-12);
+}
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.theme-btn {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 4px; cursor: pointer;
+  transition: border-color 0.13s, color 0.13s;
+}
+.theme-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ─── Layout ─── */
+.page { max-width: 900px; margin: 0 auto; padding: 0 28px 80px; }
+
+/* ─── Hero ─── */
+.hero { padding: 56px 0 48px; border-bottom: 1px solid var(--border-dim); }
+.hero-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-label::after { content: ''; flex: 1; max-width: 60px; height: 1px; background: var(--gold-20); }
+.hero h1 {
+  font-family: var(--serif); font-size: 38px; font-weight: normal;
+  color: var(--parchment); line-height: 1.2; margin-bottom: 16px;
+}
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero p {
+  font-size: 16px; color: var(--muted); max-width: 600px; line-height: 1.75;
+  margin-bottom: 28px;
+}
+.status-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.badge {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 10px;
+  border: 1px solid; display: inline-flex; align-items: center; gap: 6px;
+}
+.badge-draft { color: var(--gold); border-color: var(--gold-20); background: var(--gold-06); }
+.badge-live  { color: var(--ok);   border-color: rgba(74,222,128,0.2); background: rgba(74,222,128,0.06); }
+.badge-plan  { color: var(--muted); border-color: var(--border); background: transparent; }
+.pip { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.pip-pulse { animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* ─── Section ─── */
+.section { padding: 48px 0; border-bottom: 1px solid var(--border-dim); }
+.section:last-child { border-bottom: none; }
+.section-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 24px;
+}
+.section h2 {
+  font-family: var(--serif); font-size: 24px; font-weight: normal;
+  color: var(--parchment); margin-bottom: 14px;
+}
+.section p { color: var(--muted); line-height: 1.75; max-width: 680px; }
+.section p + p { margin-top: 12px; }
+
+/* ─── Layer diagram ─── */
+.layer-stack { display: flex; flex-direction: column; gap: 2px; margin: 32px 0; }
+.layer {
+  display: grid; grid-template-columns: 80px 1fr auto;
+  gap: 20px; align-items: start;
+  padding: 18px 20px; border-radius: 6px;
+  border: 1px solid var(--border-dim);
+  transition: border-color 0.15s;
+  text-decoration: none;
+  position: relative; overflow: hidden;
+}
+.layer::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+}
+.layer-l1 { background: linear-gradient(90deg, rgba(196,149,106,0.06) 0%, transparent 60%); }
+.layer-l1::before { background: var(--gold); }
+.layer-l2 { background: linear-gradient(90deg, rgba(139,191,255,0.06) 0%, transparent 60%); }
+.layer-l2::before { background: var(--info); }
+.layer-l3 { background: linear-gradient(90deg, rgba(124,207,184,0.06) 0%, transparent 60%); }
+.layer-l3::before { background: var(--teal); }
+.layer-hub { background: linear-gradient(90deg, rgba(167,139,250,0.06) 0%, transparent 60%); }
+.layer-hub::before { background: var(--purple); }
+.layer:hover { border-color: var(--border); }
+.layer-id {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--dim); padding-top: 2px;
+}
+.layer-body {}
+.layer-name {
+  font-family: var(--mono); font-size: 13px; color: var(--parchment);
+  margin-bottom: 6px;
+}
+.layer-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.layer-tables { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.table-chip {
+  font-family: var(--mono); font-size: 10px; color: var(--dim);
+  background: var(--panel); border: 1px solid var(--border-dim);
+  padding: 2px 8px; border-radius: 3px; letter-spacing: 0.05em;
+}
+.layer-status { padding-top: 2px; flex-shrink: 0; }
+
+/* ─── Wave progress ─── */
+.wave-track { display: flex; gap: 0; margin: 32px 0; }
+.wave {
+  flex: 1; padding: 12px 10px; text-align: center;
+  border: 1px solid var(--border-dim); border-right: none;
+  transition: background 0.15s;
+}
+.wave:first-child { border-radius: 6px 0 0 6px; }
+.wave:last-child  { border-radius: 0 6px 6px 0; border-right: 1px solid var(--border-dim); }
+.wave-active { background: var(--gold-06); border-color: var(--gold-20) !important; }
+.wave-done   { background: rgba(74,222,128,0.04); }
+.wave-id {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--dim); display: block; margin-bottom: 4px;
+}
+.wave-active .wave-id { color: var(--gold); }
+.wave-done   .wave-id { color: var(--ok); }
+.wave-name { font-size: 11px; color: var(--muted); }
+.wave-active .wave-name { color: var(--warm); }
+
+/* ─── Stat grid ─── */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 28px 0; }
+.stat {
+  background: var(--panel); border: 1px solid var(--border-dim);
+  border-radius: 6px; padding: 20px 18px;
+}
+.stat-n {
+  font-family: var(--mono); font-size: 28px; color: var(--gold);
+  display: block; margin-bottom: 6px;
+}
+.stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+/* ─── Design principles ─── */
+.principle-list { display: flex; flex-direction: column; gap: 12px; margin: 28px 0; }
+.principle {
+  display: grid; grid-template-columns: 32px 1fr; gap: 16px;
+  padding: 16px 18px; background: var(--panel); border: 1px solid var(--border-dim);
+  border-radius: 6px;
+}
+.principle-n {
+  font-family: var(--mono); font-size: 11px; color: var(--gold);
+  font-weight: bold; padding-top: 1px;
+}
+.principle-body {}
+.principle-title { font-family: var(--mono); font-size: 12px; color: var(--parchment); letter-spacing: 0.06em; margin-bottom: 4px; }
+.principle-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ─── Construction notice ─── */
+.construct {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--gold-06) 100%);
+  border: 2px dashed var(--gold-20); border-radius: 8px;
+  padding: 22px 24px; margin: 24px 0;
+}
+.construct-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 8px; display: block;
+}
+.construct p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+/* ─── Quick-nav cards ─── */
+.nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 28px 0; }
+.nav-card {
+  display: block; text-decoration: none;
+  background: var(--panel); border: 1px solid var(--border-dim);
+  border-radius: 6px; padding: 18px 16px;
+  transition: border-color 0.13s, background 0.13s;
+}
+.nav-card:hover { border-color: var(--gold-20); background: var(--raised); }
+.nav-card-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 8px; display: block;
+}
+.nav-card-title { font-size: 14px; color: var(--parchment); margin-bottom: 6px; }
+.nav-card-desc  { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* ─── Footer ─── */
+.foot {
+  margin-top: 64px; padding-top: 28px; border-top: 1px solid var(--border-dim);
+  font-family: var(--mono); font-size: 10px; color: var(--ghost);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a class="topbar-brand" href="/">Strata · RegenHub, LCA</a>
+  <div class="topbar-nav">
+    <a href="/" class="active">Overview</a>
+    <a href="/schema.html">Schema</a>
+    <a href="/policies.html">Policies</a>
+    <a href="/roles.html">Roles</a>
+    <a href="/bylaws.html">Bylaws</a>
+    <a href="/migrations.html">Migrations</a>
+  </div>
+  <div class="topbar-right">
+    <button class="theme-btn" onclick="toggleTheme()">Light / Dark</button>
+  </div>
+</nav>
+
+<main class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-label">Cooperative Information System</div>
+    <h1>Strata — the <em>living record</em><br>of RegenHub, LCA</h1>
+    <p>A visual reference for the database, policies, and roles that govern the cooperative. Each layer holds the layer above it. The deepest layer is the most permanent.</p>
+    <div class="status-row">
+      <span class="badge badge-draft"><span class="pip pip-pulse"></span>Schema defined · Wave 0</span>
+      <span class="badge badge-plan">Migrations pending deployment</span>
+      <span class="badge badge-plan">3 bootstrap agents seeded</span>
+      <span class="badge badge-plan">28 RLS policies authored</span>
+    </div>
+  </div>
+
+  <!-- What this is -->
+  <div class="section">
+    <div class="section-label">What you are looking at</div>
+    <h2>The substrate on which cooperative life grows</h2>
+    <p>Soil scientists read the past in layers. The deepest layer formed first, under the most pressure, and endures longest. Above it, progressively younger and more active strata accumulate — the mineral horizon where structure is set, then the organic layer where work and growth happen.</p>
+    <p>RegenHub's information system follows the same pattern. The bottom layer holds the bare primitives: who exists, what they agreed to, what they hold, what they did. The layers above it are more specific, more alive, and more subject to change. Strata is the field guide to those layers.</p>
+    <p>This site is a <em>construction zone</em> — honest about what is built, what is drafted, and what is planned. Status labels mean what they say.</p>
+
+    <div class="construct">
+      <span class="construct-label">⬡ Construction zone</span>
+      <p>The schema shown here is defined in migration files and under review. The Supabase instance has not yet been provisioned. When deployment occurs, live row counts and event log snapshots will appear here. Until then, this is the blueprint.</p>
+    </div>
+  </div>
+
+  <!-- Layer diagram -->
+  <div class="section">
+    <div class="section-label">Architecture</div>
+    <h2>Four layers, one system</h2>
+    <p>The CIS is organized in layers, each resting on the one below it. Lower layers are more stable and more general. Higher layers are more specific and more easily evolved.</p>
+
+    <div class="layer-stack" style="margin-top:28px;">
+
+      <div class="layer layer-l1">
+        <div class="layer-id">L1 · Primitives</div>
+        <div class="layer-body">
+          <div class="layer-name">The four primitives — REA ontology</div>
+          <div class="layer-desc">Agents (who), Agreements (what they committed to), Resources (what they hold), Events (what they did). Every cooperative fact is an instance of one of these four primitives. This layer changes rarely. When it changes, it changes deliberately.</div>
+          <div class="layer-tables">
+            <span class="table-chip">agents</span>
+            <span class="table-chip">agreements</span>
+            <span class="table-chip">agreement_sections</span>
+            <span class="table-chip">resources</span>
+            <span class="table-chip">role_assignments</span>
+          </div>
+        </div>
+        <div class="layer-status"><span class="badge badge-draft">Defined</span></div>
+      </div>
+
+      <div class="layer layer-l2">
+        <div class="layer-id">L2 · Audit</div>
+        <div class="layer-body">
+          <div class="layer-name">The unified event stream — append-only</div>
+          <div class="layer-desc">Every state change, every access decision, every Nou interaction is written here. Nothing is deleted. The event log is simultaneously the economic record and the governance audit trail — one stream, readable as a continuous business narrative.</div>
+          <div class="layer-tables">
+            <span class="table-chip">audit.events</span>
+            <span class="table-chip">export.*</span>
+          </div>
+        </div>
+        <div class="layer-status"><span class="badge badge-draft">Defined</span></div>
+      </div>
+
+      <div class="layer layer-l3">
+        <div class="layer-id">L3 · Policies</div>
+        <div class="layer-body">
+          <div class="layer-name">Row-level security — cite-as-you-enforce</div>
+          <div class="layer-desc">Every policy carries a bylaw citation. A reviewer reading a policy reads the governance basis for it. When the bylaws change, the policy is a revision signal. RLS is the membrane — selective permeability enforced at the database level, not the application level.</div>
+          <div class="layer-tables">
+            <span class="table-chip">28 policies</span>
+            <span class="table-chip">15 roles</span>
+            <span class="table-chip">3 helper functions</span>
+          </div>
+        </div>
+        <div class="layer-status"><span class="badge badge-draft">Authored</span></div>
+      </div>
+
+      <div class="layer layer-hub">
+        <div class="layer-id">Wave 2+</div>
+        <div class="layer-body">
+          <div class="layer-name">Hub operations — 12 tables, EE Grant scope</div>
+          <div class="layer-desc">Co-working seats, event tracking, KPI measurements, grant compliance. These tables are specified in the Hub Operations PRD but not yet written as migrations. They will be added in Wave 2 when the physical space operations come online.</div>
+          <div class="layer-tables">
+            <span class="table-chip">hub_applications</span>
+            <span class="table-chip">coworking_seats</span>
+            <span class="table-chip">hub_events</span>
+            <span class="table-chip">kpi_measurements</span>
+            <span class="table-chip">+ 8 more</span>
+          </div>
+        </div>
+        <div class="layer-status"><span class="badge badge-plan">Planned · W2</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Key numbers -->
+  <div class="section">
+    <div class="section-label">Current state</div>
+    <h2>What is built, counted</h2>
+    <div class="stat-grid">
+      <div class="stat"><span class="stat-n">5</span><span class="stat-label">L1 tables</span></div>
+      <div class="stat"><span class="stat-n">1</span><span class="stat-label">Audit table</span></div>
+      <div class="stat"><span class="stat-n">15</span><span class="stat-label">Roles</span></div>
+      <div class="stat"><span class="stat-n">28</span><span class="stat-label">RLS policies</span></div>
+      <div class="stat"><span class="stat-n">3</span><span class="stat-label">Bootstrap agents</span></div>
+      <div class="stat"><span class="stat-n">3</span><span class="stat-label">Migrations authored</span></div>
+    </div>
+  </div>
+
+  <!-- Wave progress -->
+  <div class="section">
+    <div class="section-label">Wave progression</div>
+    <h2>Growth in seasons, not sprints</h2>
+    <p>The CIS grows in waves. Each wave is a coherent unit of work — a season of development that leaves the system in a complete, functional state. Waves do not race; they ripen.</p>
+
+    <div class="wave-track" style="margin-top:28px;">
+      <div class="wave wave-active">
+        <span class="wave-id">W0</span>
+        <div class="wave-name">Substrate</div>
+      </div>
+      <div class="wave">
+        <span class="wave-id">W1</span>
+        <div class="wave-name">Capital</div>
+      </div>
+      <div class="wave">
+        <span class="wave-id">W2</span>
+        <div class="wave-name">Hub Ops</div>
+      </div>
+      <div class="wave">
+        <span class="wave-id">W3</span>
+        <div class="wave-name">Mercury</div>
+      </div>
+      <div class="wave">
+        <span class="wave-id">W4</span>
+        <div class="wave-name">Voting</div>
+      </div>
+      <div class="wave">
+        <span class="wave-id">W5</span>
+        <div class="wave-name">Onchain</div>
+      </div>
+      <div class="wave">
+        <span class="wave-id">W6</span>
+        <div class="wave-name">Exit-ready</div>
+      </div>
+    </div>
+
+    <p style="font-size:13px; color:var(--dim); font-family:var(--mono); margin-top:12px;">
+      Currently in W0 — Substrate. Schema definitions authored. Deployment pending.
+    </p>
+  </div>
+
+  <!-- Design principles -->
+  <div class="section">
+    <div class="section-label">Design principles</div>
+    <h2>Ten commitments the system keeps</h2>
+    <p>These are not aspirations. They are structural constraints — features of how the system is built, not policies adopted later.</p>
+
+    <div class="principle-list" style="margin-top:24px;">
+      <div class="principle">
+        <div class="principle-n">01</div>
+        <div class="principle-body">
+          <div class="principle-title">Augmentation, not automation</div>
+          <div class="principle-desc">The CIS makes members more capable, not less necessary. No decision is automated without a human in the loop.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">02</div>
+        <div class="principle-body">
+          <div class="principle-title">Bylaws as specification</div>
+          <div class="principle-desc">Every RLS policy cites the bylaw section that authorizes it. A bylaw amendment is a policy revision signal. The schema enforces what the bylaws say.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">03</div>
+        <div class="principle-body">
+          <div class="principle-title">Default deny</div>
+          <div class="principle-desc">No table is open by default. A row not matched by a permissive policy is invisible. Openness is granted explicitly, not assumed.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">04</div>
+        <div class="principle-body">
+          <div class="principle-title">Append-only event log</div>
+          <div class="principle-desc">Nothing is deleted from the audit log. Corrections are new events. The past is immutable. Triggers enforce this at the database layer — no policy or role can bypass it.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">05</div>
+        <div class="principle-body">
+          <div class="principle-title">Soft deletes throughout</div>
+          <div class="principle-desc">All records have an archived_at column. Deletion is an event (agent.archived), not an erasure. History is always recoverable.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">06</div>
+        <div class="principle-body">
+          <div class="principle-title">Stable addresses for bylaws</div>
+          <div class="principle-desc">Bylaw sections use kind:version:segment identifiers. A clause that moves in a new version retains its stable address. Citations survive amendments.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">07</div>
+        <div class="principle-body">
+          <div class="principle-title">Legibility for all audiences</div>
+          <div class="principle-desc">Every table has a plain-language description. Every policy comment names its governance basis. The database should be readable by a non-engineer board member.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">08</div>
+        <div class="principle-body">
+          <div class="principle-title">Documented exit paths</div>
+          <div class="principle-desc">Every vendor dependency (Supabase, GitHub, Mercury) has a documented walkaway path. Export views exist for all primitive tables. The system is not trapped in any one platform.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">09</div>
+        <div class="principle-body">
+          <div class="principle-title">Privacy at the row level</div>
+          <div class="principle-desc">Members cannot see each other's capital balances, resource records, or event history without explicit governance authorization. Privacy is structural, not procedural.</div>
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-n">10</div>
+        <div class="principle-body">
+          <div class="principle-title">Composability over coupling</div>
+          <div class="principle-desc">The REA primitive layer (L1) is stable and general. Modules (capital, hub ops, voting) extend it without modifying it. New layers do not break old ones.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap agents -->
+  <div class="section">
+    <div class="section-label">Bootstrap agents</div>
+    <h2>Three agents seeded at schema creation</h2>
+    <p>Before any member can join, three agents must exist: the cooperative itself, and the two AI agents that participate in its operations. These rows are pinned — their UUIDs are stable and referenced in application code and harness configuration.</p>
+
+    <div class="nav-grid" style="margin-top:20px;">
+      <div class="nav-card" style="cursor:default;">
+        <span class="nav-card-label">legal · pinned</span>
+        <div class="nav-card-title">RegenHub, LCA</div>
+        <div class="nav-card-desc">The cooperative as an agent in its own system. DBA Techne. Colorado LCA, filed February 2026.</div>
+      </div>
+      <div class="nav-card" style="cursor:default;">
+        <span class="nav-card-label">agent_ai · role: nou</span>
+        <div class="nav-card-title">Nou</div>
+        <div class="nav-card-desc">Collective intelligence agent. ERC-8004 ID 2202 on Base. ENS: nou.habitat.eth. Perception, connection, ground, coordination.</div>
+      </div>
+      <div class="nav-card" style="cursor:default;">
+        <span class="nav-card-label">agent_ai · no role yet</span>
+        <div class="nav-card-title">Dianoia</div>
+        <div class="nav-card-desc">Execution intelligence agent. GitHub: dianoi/dianoia. Pronouns: they/them. Where pattern meets material.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigate deeper -->
+  <div class="section">
+    <div class="section-label">Go deeper</div>
+    <h2>Reference pages</h2>
+
+    <div class="nav-grid">
+      <a class="nav-card" href="schema.html">
+        <span class="nav-card-label">Schema</span>
+        <div class="nav-card-title">Tables &amp; columns</div>
+        <div class="nav-card-desc">Every table explained in plain language and technical spec. Column types, constraints, relationships.</div>
+      </a>
+      <a class="nav-card" href="policies.html">
+        <span class="nav-card-label">Policies</span>
+        <div class="nav-card-title">Access policies</div>
+        <div class="nav-card-desc">28 RLS policies, each with its bylaw citation. Who can read what, write what, and why.</div>
+      </a>
+      <a class="nav-card" href="roles.html">
+        <span class="nav-card-label">Roles</span>
+        <div class="nav-card-title">15 roles</div>
+        <div class="nav-card-desc">Plain-language descriptions of each role — what a person in that role can see, do, and access.</div>
+      </a>
+      <a class="nav-card" href="bylaws.html">
+        <span class="nav-card-label">Bylaws</span>
+        <div class="nav-card-title">Loaded sections</div>
+        <div class="nav-card-desc">The bylaws as queryable rows. Browse by article. Stable addresses for every clause.</div>
+      </a>
+      <a class="nav-card" href="migrations.html">
+        <span class="nav-card-label">Migrations</span>
+        <div class="nav-card-title">Build history</div>
+        <div class="nav-card-desc">The timeline of what has been built. Three migrations authored. Deployment pending.</div>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<div class="page">
+  <div class="foot">
+    <span>Strata · RegenHub, LCA · Techne v4</span>
+    <span>Schema: W0 · Not yet deployed</span>
+    <span>github.com/Techne-Co-op/strata</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var saved = localStorage.getItem('strata-theme');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+  else if(window.matchMedia('(prefers-color-scheme: light)').matches)
+    document.documentElement.setAttribute('data-theme','light');
+})();
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('strata-theme', next);
+}
+</script>
+</body>
+</html>

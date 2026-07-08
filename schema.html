@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schema — Strata · RegenHub, LCA</title>
+<style>
+:root{--void:#0c0c0c;--ink:#111111;--surface:#161616;--panel:#1e1e1e;--raised:#242424;--border:#333333;--border-dim:#272727;--gold:#c4956a;--gold-20:rgba(196,149,106,0.20);--gold-12:rgba(196,149,106,0.12);--gold-06:rgba(196,149,106,0.06);--parchment:#f0f0f0;--warm:#d0d0d0;--muted:#9a9a9a;--dim:#666666;--ghost:#444444;--ok:#4ade80;--warn:#fbbf24;--err:#ef4444;--info:#8bbfff;--teal:#7ccfb8;--purple:#a78bfa;--mono:'IBM Plex Mono','JetBrains Mono',Consolas,monospace;--serif:Georgia,'Times New Roman',serif;--sans:Inter,system-ui,sans-serif}
+[data-theme="light"]{--void:#f7f5f0;--ink:#eeece8;--surface:#ffffff;--panel:#f4f1ec;--raised:#ece9e3;--border:#d8d4cc;--border-dim:#e5e2db;--gold:#a07850;--gold-20:rgba(160,120,80,0.20);--gold-12:rgba(160,120,80,0.12);--gold-06:rgba(160,120,80,0.06);--parchment:#1a1a1a;--warm:#333333;--muted:#666666;--dim:#999999;--ghost:#bbbbbb;--ok:#16a34a;--warn:#d97706;--err:#dc2626;--info:#2563eb;--teal:#0d9488;--purple:#7c3aed}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--void);color:var(--warm);font-family:var(--sans);font-size:15px;line-height:1.6}
+.topbar{position:sticky;top:0;z-index:100;background:var(--ink);border-bottom:1px solid var(--border-dim);height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.topbar-brand{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);text-decoration:none}
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar-nav a{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:4px 10px;border-radius:4px;transition:color 0.13s,background 0.13s}
+.topbar-nav a:hover,.topbar-nav a.active{color:var(--gold);background:var(--gold-12)}
+.theme-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:4px;cursor:pointer;transition:border-color 0.13s,color 0.13s}
+.theme-btn:hover{border-color:var(--gold);color:var(--gold)}
+.page{max-width:900px;margin:0 auto;padding:0 28px 80px}
+.hero{padding:48px 0 36px;border-bottom:1px solid var(--border-dim)}
+.hero-label{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.hero h1{font-family:var(--serif);font-size:32px;font-weight:normal;color:var(--parchment);line-height:1.25;margin-bottom:12px}
+.hero p{font-size:15px;color:var(--muted);max-width:600px;line-height:1.75}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:10px;border:1px solid;display:inline-flex;align-items:center;gap:6px}
+.badge-draft{color:var(--gold);border-color:var(--gold-20);background:var(--gold-06)}
+.badge-plan{color:var(--muted);border-color:var(--border);background:transparent}
+.section{padding:40px 0;border-bottom:1px solid var(--border-dim)}
+.section:last-child{border-bottom:none}
+.section-label{font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+
+/* table card */
+.table-card{background:var(--panel);border:1px solid var(--border-dim);border-radius:8px;margin-bottom:16px;overflow:hidden}
+.table-card-header{padding:18px 20px;border-bottom:1px solid var(--border-dim);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.table-card-name{font-family:var(--mono);font-size:15px;color:var(--gold);margin-bottom:4px}
+.table-card-plain{font-size:13px;color:var(--muted);line-height:1.6;max-width:580px}
+.table-card-badge{flex-shrink:0}
+.table-card-schema{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:0.08em}
+.cols-table{width:100%;border-collapse:collapse}
+.cols-table th{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:8px 20px;border-bottom:1px solid var(--border-dim);background:var(--raised)}
+.cols-table td{font-family:var(--mono);font-size:12px;padding:9px 20px;border-bottom:1px solid var(--border-dim);vertical-align:top}
+.cols-table tr:last-child td{border-bottom:none}
+.col-name{color:var(--parchment)}
+.col-type{color:var(--info)}
+.col-note{color:var(--muted);font-family:var(--sans);font-size:12px}
+.col-pk{color:var(--gold);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;background:var(--gold-06);border:1px solid var(--gold-20);padding:1px 5px;border-radius:3px;vertical-align:middle;margin-left:6px}
+.col-fk{color:var(--teal);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;background:rgba(124,207,184,0.06);border:1px solid rgba(124,207,184,0.2);padding:1px 5px;border-radius:3px;vertical-align:middle;margin-left:6px}
+.layer-accent-l1{border-left:3px solid var(--gold)}
+.layer-accent-l2{border-left:3px solid var(--info)}
+.lifecycle{font-family:var(--mono);font-size:11px;color:var(--dim);background:var(--raised);border-top:1px solid var(--border-dim);padding:10px 20px;letter-spacing:0.04em}
+.lifecycle span{color:var(--muted)}
+.foot{margin-top:64px;padding-top:28px;border-top:1px solid var(--border-dim);font-family:var(--mono);font-size:10px;color:var(--ghost);letter-spacing:0.08em;text-transform:uppercase;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <a class="topbar-brand" href="/">Strata · RegenHub, LCA</a>
+  <div class="topbar-nav">
+    <a href="/">Overview</a>
+    <a href="/schema.html" class="active">Schema</a>
+    <a href="/policies.html">Policies</a>
+    <a href="/roles.html">Roles</a>
+    <a href="/bylaws.html">Bylaws</a>
+    <a href="/migrations.html">Migrations</a>
+  </div>
+  <div><button class="theme-btn" onclick="toggleTheme()">Light / Dark</button></div>
+</nav>
+
+<main class="page">
+  <div class="hero">
+    <div class="hero-label">Schema reference</div>
+    <h1>Tables &amp; columns</h1>
+    <p>Six tables in two schemas. Every column explained. The L1 primitives hold the facts; the L2 audit stream holds the history of how those facts came to be.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+      <span class="badge badge-draft">6 tables · 2 schemas</span>
+      <span class="badge badge-plan">RLS enabled on all</span>
+      <span class="badge badge-plan">Soft deletes throughout</span>
+    </div>
+  </div>
+
+  <!-- L1 Primitives -->
+  <div class="section">
+    <div class="section-label">L1 · Primitives · public schema</div>
+
+    <!-- agents -->
+    <div class="table-card layer-accent-l1">
+      <div class="table-card-header">
+        <div>
+          <div class="table-card-schema">public.</div>
+          <div class="table-card-name">agents</div>
+          <div class="table-card-plain">Everyone and everything that participates in the cooperative's economic life. A row exists for each member (natural person), for each partner organization (legal entity), and for each AI agent (Nou, Dianoia). The cooperative itself — RegenHub, LCA — is also an agent in this table. This makes the database self-referential in a meaningful way: the entity that owns the database is a row within it.</div>
+        </div>
+        <div class="table-card-badge"><span class="badge badge-draft">Defined</span></div>
+      </div>
+      <table class="cols-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id <span class="col-pk">PK</span></td><td class="col-type">UUID</td><td class="col-note">Generated. Stable. Referenced by role_assignments, resources, audit.events.</td></tr>
+          <tr><td class="col-name">kind</td><td class="col-type">TEXT</td><td class="col-note">natural | legal | agent_ai. Determines which RLS policies apply.</td></tr>
+          <tr><td class="col-name">display_name</td><td class="col-type">TEXT</td><td class="col-note">Required. Must be non-empty after trimming.</td></tr>
+          <tr><td class="col-name">email</td><td class="col-type">CITEXT</td><td class="col-note">Case-insensitive. Unique. Null for AI agents.</td></tr>
+          <tr><td class="col-name">auth_user_id <span class="col-fk">FK → auth.users</span></td><td class="col-type">UUID</td><td class="col-note">Null until Phase 3 (Supabase Auth wiring). SET NULL on auth deletion — agent record persists.</td></tr>
+          <tr><td class="col-name">metadata</td><td class="col-type">JSONB</td><td class="col-note">Extension field. AI agents store ENS, chain, ERC-8004 ID here.</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">Set at insert. Never modified.</td></tr>
+          <tr><td class="col-name">updated_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">Maintained by trigger. Changes when display_name or metadata updates.</td></tr>
+          <tr><td class="col-name">archived_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">Soft delete. NULL = active. An agent.archived event sets this.</td></tr>
+        </tbody>
+      </table>
+      <div class="lifecycle"><span>Lifecycle:</span> agent.created → agent.email_verified → agent.archived</div>
+    </div>
+
+    <!-- agreements -->
+    <div class="table-card layer-accent-l1">
+      <div class="table-card-header">
+        <div>
+          <div class="table-card-schema">public.</div>
+          <div class="table-card-name">agreements</div>
+          <div class="table-card-plain">The document registry. Every binding commitment — bylaws, member agreements, hub membership agreements, the EE grant letter, minutes, motions — has a row here. The actual clause text lives in agreement_sections (the child table). This table is the envelope; sections are the content. Amendments are new rows with a superseded_by link pointing back to the version being replaced.</div>
+        </div>
+        <div class="table-card-badge"><span class="badge badge-draft">Defined</span></div>
+      </div>
+      <table class="cols-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id <span class="col-pk">PK</span></td><td class="col-type">UUID</td><td class="col-note">Generated.</td></tr>
+          <tr><td class="col-name">kind</td><td class="col-type">TEXT</td><td class="col-note">bylaws | member_agreement | hub_member_agreement | grant | minutes | motion | employment. Open enum.</td></tr>
+          <tr><td class="col-name">title</td><td class="col-type">TEXT</td><td class="col-note">Human-readable document name.</td></tr>
+          <tr><td class="col-name">version</td><td class="col-type">TEXT</td><td class="col-note">e.g. "v2", "v2.3", "2026-05-22". Displayed alongside title.</td></tr>
+          <tr><td class="col-name">effective_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">When this agreement came into force. Distinct from created_at.</td></tr>
+          <tr><td class="col-name">superseded_by <span class="col-fk">FK → agreements</span></td><td class="col-type">UUID</td><td class="col-note">Self-referential. NULL = current version. Follow the chain to reach the latest.</td></tr>
+          <tr><td class="col-name">document_uri</td><td class="col-type">TEXT</td><td class="col-note">Supabase Storage path or external URL. Bytes live here; sections are the parsed form.</td></tr>
+          <tr><td class="col-name">metadata</td><td class="col-type">JSONB</td><td class="col-note">Flexible. Used for grant metadata, signatory lists, etc.</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">Set at insert.</td></tr>
+          <tr><td class="col-name">archived_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">Soft archive. Active agreements have NULL.</td></tr>
+        </tbody>
+      </table>
+      <div class="lifecycle"><span>Lifecycle:</span> agreement.published → agreement.superseded</div>
+    </div>
+
+    <!-- agreement_sections -->
+    <div class="table-card layer-accent-l1">
+      <div class="table-card-header">
+        <div>
+          <div class="table-card-schema">public.</div>
+          <div class="table-card-name">agreement_sections</div>
+          <div class="table-card-plain">The bylaws as queryable rows. Every article, every section, every clause is a row in this table. The address column gives each section a stable identifier — bylaws:v2:art-1.sec-4 — that survives renumbering and amendments. When a section changes in a new bylaw version, the old row is not deleted; a new row is created and the old one gets a superseded_by link. This means Nou can cite bylaws:v2:art-18.sec-1 and the citation remains valid even after bylaws v3 is adopted.</div>
+        </div>
+        <div class="table-card-badge"><span class="badge badge-draft">Defined</span></div>
+      </div>
+      <table class="cols-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id <span class="col-pk">PK</span></td><td class="col-type">UUID</td><td class="col-note">Generated.</td></tr>
+          <tr><td class="col-name">agreement_id <span class="col-fk">FK → agreements</span></td><td class="col-type">UUID</td><td class="col-note">Required. ON DELETE RESTRICT — can't delete a document while its sections exist.</td></tr>
+          <tr><td class="col-name">address</td><td class="col-type">TEXT</td><td class="col-note">Stable identifier: kind:version:segment. e.g. "bylaws:v2:art-1.sec-4". Unique per agreement.</td></tr>
+          <tr><td class="col-name">ordinal</td><td class="col-type">INTEGER</td><td class="col-note">Position for ordered traversal. Reconstruct the document by ORDER BY ordinal.</td></tr>
+          <tr><td class="col-name">heading</td><td class="col-type">TEXT</td><td class="col-note">Section heading. Nullable (preamble, articles without sub-sections).</td></tr>
+          <tr><td class="col-name">body_markdown</td><td class="col-type">TEXT</td><td class="col-note">Full section text in Markdown.</td></tr>
+          <tr><td class="col-name">body_text</td><td class="col-type">TEXT GENERATED</td><td class="col-note">Plain text for FTS. Generated from body_markdown. Used by to_tsvector() index.</td></tr>
+          <tr><td class="col-name">embedding</td><td class="col-type">VECTOR(1536)</td><td class="col-note">Semantic embedding for Nou's retrieval pipeline. Populated async in Wave 0 Phase 4. NULL until then.</td></tr>
+          <tr><td class="col-name">superseded_by <span class="col-fk">FK → agreement_sections</span></td><td class="col-type">UUID</td><td class="col-note">Points to replacement in a later version. NULL = current clause.</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">Set at insert. Immutable.</td></tr>
+        </tbody>
+      </table>
+      <div class="lifecycle"><span>Indexes:</span> address lookup · ordinal traversal · FTS (GIN on body_text) · current-only partial index</div>
+    </div>
+
+    <!-- resources -->
+    <div class="table-card layer-accent-l1">
+      <div class="table-card-header">
+        <div>
+          <div class="table-card-schema">public.</div>
+          <div class="table-card-name">resources</div>
+          <div class="table-card-plain">Economic things with value that agents hold or control. A member's capital account balance, their equity share, a co-working seat, a treasury holding, accumulated CLOUD credits — all are rows in this table. The kind column distinguishes them. The quantity column is a fast-read snapshot; the authoritative value is always derived from the event stream. Think of this as the balance sheet, not the ledger.</div>
+        </div>
+        <div class="table-card-badge"><span class="badge badge-draft">Defined</span></div>
+      </div>
+      <table class="cols-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id <span class="col-pk">PK</span></td><td class="col-type">UUID</td><td class="col-note">Generated.</td></tr>
+          <tr><td class="col-name">kind</td><td class="col-type">TEXT</td><td class="col-note">capital_balance | equity_share | hub_seat | treasury_holding | cloud_credit. Open enum.</td></tr>
+          <tr><td class="col-name">owner_agent_id <span class="col-fk">FK → agents</span></td><td class="col-type">UUID</td><td class="col-note">Who holds or controls this resource. May be RegenHub itself (cooperative-owned resources).</td></tr>
+          <tr><td class="col-name">governing_agreement_id <span class="col-fk">FK → agreements</span></td><td class="col-type">UUID</td><td class="col-note">Agreement that governs this resource. e.g. Patron Member Agreement for a capital_balance.</td></tr>
+          <tr><td class="col-name">quantity</td><td class="col-type">NUMERIC(20,8)</td><td class="col-note">Snapshot value. Precise to 8 decimal places for CLOUD credits and fractions.</td></tr>
+          <tr><td class="col-name">unit</td><td class="col-type">TEXT</td><td class="col-note">'USD', 'CLOUD', 'seat', 'share', etc.</td></tr>
+          <tr><td class="col-name">metadata</td><td class="col-type">JSONB</td><td class="col-note">Kind-specific extension data.</td></tr>
+          <tr><td class="col-name">created_at / updated_at / archived_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">Standard lifecycle columns. updated_at maintained by trigger.</td></tr>
+        </tbody>
+      </table>
+      <div class="lifecycle"><span>Note:</span> quantity is a snapshot. Authoritative value = sum of capital events in audit.events.</div>
+    </div>
+
+    <!-- role_assignments -->
+    <div class="table-card layer-accent-l1">
+      <div class="table-card-header">
+        <div>
+          <div class="table-card-schema">public.</div>
+          <div class="table-card-name">role_assignments</div>
+          <div class="table-card-plain">The source of truth for who has what role, and when. Every role grant and revocation is a row here. Revocation sets the revoked_at column; no row is ever deleted. This means you can reconstruct the exact role an agent held at any moment in history: granted_at ≤ moment AND (revoked_at IS NULL OR revoked_at > moment). Every RLS policy in the database joins to this table to determine what the invoking user is permitted to do.</div>
+        </div>
+        <div class="table-card-badge"><span class="badge badge-draft">Defined</span></div>
+      </div>
+      <table class="cols-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id <span class="col-pk">PK</span></td><td class="col-type">UUID</td><td class="col-note">Generated.</td></tr>
+          <tr><td class="col-name">agent_id <span class="col-fk">FK → agents</span></td><td class="col-type">UUID</td><td class="col-note">Required. The agent receiving the role.</td></tr>
+          <tr><td class="col-name">auth_user_id <span class="col-fk">FK → auth.users</span></td><td class="col-type">UUID</td><td class="col-note">Redundant with agents.auth_user_id for fast RLS lookup without an extra join. Kept in sync by trigger.</td></tr>
+          <tr><td class="col-name">role</td><td class="col-type">TEXT</td><td class="col-note">One of 15 roles. See Roles page for full list and descriptions.</td></tr>
+          <tr><td class="col-name">granted_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">When the role was granted. Defaults to now().</td></tr>
+          <tr><td class="col-name">revoked_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">NULL = active grant. Constraint: revoked_at must be after granted_at.</td></tr>
+          <tr><td class="col-name">granted_by_agent_id <span class="col-fk">FK → agents</span></td><td class="col-type">UUID</td><td class="col-note">Who authorized the grant.</td></tr>
+          <tr><td class="col-name">governing_agreement_id <span class="col-fk">FK → agreements</span></td><td class="col-type">UUID</td><td class="col-note">The agreement that authorizes this role. e.g. bylaws for director role.</td></tr>
+          <tr><td class="col-name">metadata</td><td class="col-type">JSONB</td><td class="col-note">Extension data. Bootstrap note in the Nou row.</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">Set at insert.</td></tr>
+        </tbody>
+      </table>
+      <div class="lifecycle"><span>Key index:</span> Partial index on (auth_user_id, role) WHERE revoked_at IS NULL — used by every RLS policy evaluation</div>
+    </div>
+
+  </div><!-- end L1 section -->
+
+  <!-- L2 Audit -->
+  <div class="section">
+    <div class="section-label">L2 · Audit · audit schema</div>
+
+    <div class="table-card layer-accent-l2">
+      <div class="table-card-header">
+        <div>
+          <div class="table-card-schema">audit.</div>
+          <div class="table-card-name">events</div>
+          <div class="table-card-plain">The cooperative's permanent record. Every state change, every access decision, every Nou query is a row here. The table is append-only — a database trigger prevents any UPDATE or DELETE at the engine level, not just the policy level. No role can bypass it. This is simultaneously the REA economic event log (capital.contributed, agreement.signed) and the operational audit trail (role.assigned, access.denied) — one stream, readable as a continuous business narrative without joins.</div>
+        </div>
+        <div class="table-card-badge"><span class="badge badge-draft">Defined</span></div>
+      </div>
+      <table class="cols-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id <span class="col-pk">PK</span></td><td class="col-type">UUID</td><td class="col-note">Generated. Immutable once written.</td></tr>
+          <tr><td class="col-name">occurred_at</td><td class="col-type">TIMESTAMPTZ</td><td class="col-note">When the event happened. Indexed DESC for recency queries.</td></tr>
+          <tr><td class="col-name">actor_id <span class="col-fk">FK → agents</span></td><td class="col-type">UUID</td><td class="col-note">Who caused this event. NULL for system events (migrations, cron jobs).</td></tr>
+          <tr><td class="col-name">actor_role</td><td class="col-type">TEXT</td><td class="col-note">Role held at the moment of the event. Stored directly — role_assignments may change later.</td></tr>
+          <tr><td class="col-name">event_type</td><td class="col-type">TEXT</td><td class="col-note">Dot-namespaced past-tense verb. e.g. agreement.signed, capital.contributed, access.denied.</td></tr>
+          <tr><td class="col-name">target_table</td><td class="col-type">TEXT</td><td class="col-note">Schema-qualified table name. e.g. public.agents, audit.events.</td></tr>
+          <tr><td class="col-name">target_id</td><td class="col-type">UUID</td><td class="col-note">The row that changed or was the subject of the event.</td></tr>
+          <tr><td class="col-name">before_state</td><td class="col-type">JSONB</td><td class="col-note">Row snapshot before the event. NULL for INSERT events.</td></tr>
+          <tr><td class="col-name">after_state</td><td class="col-type">JSONB</td><td class="col-note">Row snapshot after the event. NULL for DELETE events.</td></tr>
+          <tr><td class="col-name">policy_citation</td><td class="col-type">TEXT</td><td class="col-note">Stable bylaw address authorizing this event. e.g. "bylaws:v2:art-18.sec-1". Populated from Phase 2.</td></tr>
+          <tr><td class="col-name">attestation_uri</td><td class="col-type">TEXT</td><td class="col-note">EAS on-chain attestation URI. NULL until Wave 3 attestation begins.</td></tr>
+          <tr><td class="col-name">payload</td><td class="col-type">JSONB</td><td class="col-note">Event-type-specific data. Phase, milestone notes, custom fields per event namespace.</td></tr>
+        </tbody>
+      </table>
+      <div class="lifecycle"><span>Enforced append-only:</span> BEFORE UPDATE and BEFORE DELETE triggers raise an exception. No role or policy can bypass this.</div>
+    </div>
+
+  </div><!-- end L2 section -->
+
+  <!-- Export views -->
+  <div class="section">
+    <div class="section-label">export schema · walkaway rehearsal</div>
+    <p style="color:var(--muted);font-size:14px;line-height:1.75;">The export schema contains views over every primitive table. These views are the inputs to the walkaway rehearsal — a test of the cooperative's ability to leave any vendor and reconstruct its data elsewhere. Embeddings are excluded from CSV export (they are regenerated from body_text on rebuild).</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--teal);background:rgba(124,207,184,0.06);border:1px solid rgba(124,207,184,0.15);padding:4px 10px;border-radius:4px;">export.agents</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--teal);background:rgba(124,207,184,0.06);border:1px solid rgba(124,207,184,0.15);padding:4px 10px;border-radius:4px;">export.agreements</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--teal);background:rgba(124,207,184,0.06);border:1px solid rgba(124,207,184,0.15);padding:4px 10px;border-radius:4px;">export.agreement_sections</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--teal);background:rgba(124,207,184,0.06);border:1px solid rgba(124,207,184,0.15);padding:4px 10px;border-radius:4px;">export.resources</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--teal);background:rgba(124,207,184,0.06);border:1px solid rgba(124,207,184,0.15);padding:4px 10px;border-radius:4px;">export.role_assignments</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--teal);background:rgba(124,207,184,0.06);border:1px solid rgba(124,207,184,0.15);padding:4px 10px;border-radius:4px;">export.audit_events</span>
+    </div>
+  </div>
+
+</main>
+
+<div class="page">
+  <div class="foot">
+    <span>Strata · Schema · RegenHub, LCA</span>
+    <span>6 tables · 2 schemas · W0</span>
+    <span><a href="/" style="color:inherit;text-decoration:none;">← Overview</a></span>
+  </div>
+</div>
+
+<script>
+(function(){var s=localStorage.getItem('strata-theme');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme: light)').matches)document.documentElement.setAttribute('data-theme','light');})();
+function toggleTheme(){var c=document.documentElement.getAttribute('data-theme');var n=c==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('strata-theme',n);}
+</script>
+</body>
+</html>

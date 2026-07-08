@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bylaws — Strata / CIS</title>
+<style>
+:root {
+  --gold: #c4956a;
+  --gold-dim: rgba(196,149,106,0.12);
+  --gold-border: rgba(196,149,106,0.3);
+  --teal: #5fa8a0;
+  --teal-dim: rgba(95,168,160,0.1);
+  --blue: #5b8db8;
+  --muted: #888;
+  --void: #0a0a0b;
+  --ink: #e8e4dc;
+  --surface: #141416;
+  --panel: #1c1c20;
+  --border: rgba(255,255,255,0.08);
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+[data-theme="light"] {
+  --void: #faf8f4;
+  --ink: #1a1a1e;
+  --surface: #f0ece4;
+  --panel: #e8e4dc;
+  --border: rgba(0,0,0,0.1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+nav {
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.nav-brand { color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; }
+.nav-links { display: flex; gap: 1rem; margin-left: auto; flex-wrap: wrap; }
+.nav-links a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+.theme-toggle {
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer; padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono); font-size: 0.7rem; border-radius: 3px;
+}
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+
+.container { max-width: 960px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+.hero { margin-bottom: 3rem; }
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+.hero h1 {
+  font-size: 2.2rem;
+  font-weight: normal;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+.hero-sub { color: var(--muted); font-size: 1rem; max-width: 640px; margin-bottom: 1.5rem; }
+.hero-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+}
+.hero-meta span { color: var(--ink); }
+
+.stat-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.stat-chip {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 4px; padding: 0.5rem 1rem;
+  font-family: var(--font-mono); font-size: 0.72rem;
+}
+.stat-chip .num { font-size: 1.25rem; color: var(--gold); display: block; line-height: 1.2; }
+
+/* STATUS BADGE */
+.status-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.status-draft { background: rgba(196,149,106,0.15); color: var(--gold); border: 1px solid rgba(196,149,106,0.3); }
+.status-ratified { background: rgba(95,168,160,0.12); color: var(--teal); border: 1px solid rgba(95,168,160,0.3); }
+.status-seed { background: rgba(91,141,184,0.12); color: var(--blue); border: 1px solid rgba(91,141,184,0.3); }
+
+/* META BOX */
+.meta-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+.meta-box h3 {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+.meta-row {
+  display: flex; gap: 2rem; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.meta-key { color: var(--muted); min-width: 120px; }
+.meta-val { color: var(--ink); }
+.meta-val a { color: var(--gold); text-decoration: none; }
+.meta-val a:hover { text-decoration: underline; }
+
+/* KNOWN ISSUES */
+.issues-box {
+  background: rgba(196,149,106,0.07);
+  border: 1px dashed var(--gold-border);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+}
+.issues-box h3 {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+.issues-box ul { padding-left: 1.25rem; font-size: 0.85rem; }
+.issues-box ul li { margin-bottom: 0.35rem; color: var(--muted); }
+
+/* ADDRESSING */
+.addressing-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.addressing-box h3 {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--teal);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+.addr-example {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  color: var(--teal);
+}
+.addr-desc { font-size: 0.88rem; color: var(--muted); margin-bottom: 0.5rem; }
+
+/* ARTICLE NAVIGATION */
+.article-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+  padding: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.article-nav a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.article-nav a:hover { color: var(--gold); border-color: var(--gold-border); }
+
+/* SECTION CARDS */
+.article {
+  margin-bottom: 3rem;
+}
+.article-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.article-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  min-width: 70px;
+}
+.article-title {
+  font-size: 1.15rem;
+  font-weight: normal;
+}
+.article-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.section-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.section-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.section-address {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--teal);
+  background: var(--teal-dim);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid rgba(95,168,160,0.2);
+}
+.section-heading {
+  font-size: 0.95rem;
+  font-weight: normal;
+  flex: 1;
+}
+.section-body {
+  font-size: 0.88rem;
+  color: var(--ink);
+  line-height: 1.75;
+}
+.section-body p { margin-bottom: 0.5rem; }
+.section-truncated {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.subsection-item {
+  border-left: 2px solid var(--border);
+  padding: 0.5rem 0 0.5rem 1rem;
+  margin: 0.35rem 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.subsection-item:last-child { margin-bottom: 0; }
+
+/* POLICIES CITED */
+.policies-cited {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.policies-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+.policy-ref {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--teal);
+  background: var(--teal-dim);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+/* PLANNED ARTICLES */
+.planned-article {
+  background: var(--panel);
+  border: 2px dashed rgba(196,149,106,0.25);
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0.65;
+}
+.planned-article-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  min-width: 70px;
+}
+.planned-article-title { font-size: 0.9rem; }
+.planned-note {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Strata / CIS</span>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="schema.html">Schema</a>
+    <a href="policies.html">Policies</a>
+    <a href="roles.html">Roles</a>
+    <a href="bylaws.html" class="active">Bylaws</a>
+    <a href="migrations.html">Migrations</a>
+    <button class="theme-toggle" onclick="toggleTheme()">◐</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Bylaws — RegenHub, LCA (DBA Techne)</div>
+    <h1>The cooperative's<br>foundational agreements</h1>
+    <p class="hero-sub">
+      The bylaws are the soil in which everything else grows. They are not a rulebook —
+      they are a record of commitments made by people who chose to govern themselves together.
+      The CIS stores them as stable-addressed sections so that every policy and every audit event
+      can cite the specific passage that authorizes it.
+    </p>
+    <div class="hero-meta">
+      18 articles &nbsp;·&nbsp; version v2 &nbsp;·&nbsp;
+      <span>status: draft</span>
+      &nbsp;·&nbsp; 2 blocking issues remain
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-chip"><span class="num">18</span>articles</div>
+    <div class="stat-chip"><span class="num">v2</span>current version</div>
+    <div class="stat-chip"><span class="num">2</span>blocking issues</div>
+    <div class="stat-chip"><span class="num">1</span>agreement row</div>
+    <div class="stat-chip"><span class="num">stable</span>address format</div>
+  </div>
+
+  <!-- AGREEMENT METADATA -->
+  <div class="meta-box">
+    <h3>Agreement Record</h3>
+    <div class="meta-row"><span class="meta-key">ID</span><span class="meta-val">bbbbbbbb-0001-0001-0001-000000000001</span></div>
+    <div class="meta-row"><span class="meta-key">Kind</span><span class="meta-val">bylaws</span></div>
+    <div class="meta-row"><span class="meta-key">Title</span><span class="meta-val">Bylaws — RegenHub, LCA (DBA Techne)</span></div>
+    <div class="meta-row"><span class="meta-key">Version</span><span class="meta-val">v2 <span class="status-badge status-draft">DRAFT</span></span></div>
+    <div class="meta-row"><span class="meta-key">Effective at</span><span class="meta-val">2026-05-11</span></div>
+    <div class="meta-row"><span class="meta-key">Document URI</span><span class="meta-val"><a href="https://techne.institute/legal/bylaws-v2/" target="_blank">techne.institute/legal/bylaws-v2/</a></span></div>
+    <div class="meta-row"><span class="meta-key">Drafted by</span><span class="meta-val">Jeff Pote / Pote Law Firm</span></div>
+    <div class="meta-row"><span class="meta-key">Legal basis</span><span class="meta-val">Colorado ULCAA C.R.S. Title 7, Art. 58</span></div>
+    <div class="meta-row"><span class="meta-key">Status note</span><span class="meta-val" style="color:var(--muted)">Draft for review by outside counsel — not executed — not legal advice</span></div>
+  </div>
+
+  <div class="issues-box">
+    <h3>Known Blocking Issues</h3>
+    <ul>
+      <li>Section 5.3.5 is referenced in §1.12.3 but does not appear in the document body — likely a drafting artifact.</li>
+      <li>Schedule A share prices and dues are placeholders — must be completed before bylaws take effect.</li>
+    </ul>
+  </div>
+
+  <!-- STABLE ADDRESSING -->
+  <div class="addressing-box">
+    <h3>Stable Address Format</h3>
+    <p class="addr-desc">
+      Every bylaw section has a stable address in the format <code>kind:version:segment</code>.
+      This address survives renumbering and amendments — a superseded_by chain links old
+      addresses to their successors. Every RLS policy citation and audit event reference
+      uses this format.
+    </p>
+    <div class="addr-example">bylaws:v2:preamble</div>
+    <div class="addr-example">bylaws:v2:art-1.sec-4</div>
+    <div class="addr-example">bylaws:v2:art-1.sec-2.sub-3</div>
+    <p class="addr-desc" style="margin-top:0.75rem">
+      Sub-clauses lettered (a)(b)(c) are inline in the parent section body.
+      Only numbered sub-clauses get their own address row.
+    </p>
+  </div>
+
+  <!-- ARTICLE NAVIGATION -->
+  <div class="article-nav">
+    <a href="#preamble">Preamble</a>
+    <a href="#art-1">I · Membership</a>
+    <a href="#art-2">II · Meetings</a>
+    <a href="#art-3">III · Board</a>
+    <a href="#art-4">IV · Officers</a>
+    <a href="#art-5">V · Committees</a>
+    <a href="#art-6">VI · Capital</a>
+    <a href="#art-7">VII · Patronage</a>
+    <a href="#art-8">VIII · Distributions</a>
+    <a href="#art-9">IX · Fiscal Year</a>
+    <a href="#art-10">X · Records</a>
+    <a href="#art-11">XI · Indemnification</a>
+    <a href="#art-12">XII · Dissolution</a>
+    <a href="#art-13">XIII · Amendments</a>
+    <a href="#art-14">XIV · Conflict of Interest</a>
+    <a href="#art-15">XV · Public Benefit</a>
+    <a href="#art-16">XVI · Digital Governance</a>
+    <a href="#art-17">XVII · Cooperative Principles</a>
+    <a href="#art-18">XVIII · Roles & Access</a>
+  </div>
+
+  <!-- PREAMBLE -->
+  <div class="article" id="preamble">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:preamble</span>
+      <span class="article-title">Preamble</span>
+      <span class="article-count">1 section</span>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:preamble</span>
+        <span class="section-heading">Preamble</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>
+          RegenHub, LCA is a public benefit limited cooperative association, organized pursuant to
+          the Colorado Uniform Limited Cooperative Association Act (ULCAA), C.R.S. Title 7, Article 58.
+        </p>
+        <p>
+          The cooperative's business shall be conducted on a cooperative basis for the mutual benefit
+          of its members, in accordance with the public benefit purpose stated in the Articles of Organization.
+        </p>
+        <p>The cooperative adopts and subscribes to the seven International Cooperative Alliance principles:</p>
+        <div class="subsection-item">1. Voluntary and Open Membership</div>
+        <div class="subsection-item">2. Democratic Member Control</div>
+        <div class="subsection-item">3. Members' Economic Participation</div>
+        <div class="subsection-item">4. Autonomy and Independence</div>
+        <div class="subsection-item">5. Education, Training, and Information</div>
+        <div class="subsection-item">6. Cooperation among Cooperatives</div>
+        <div class="subsection-item">7. Concern for Community</div>
+        <p style="margin-top:0.75rem">
+          In the event of conflict: mandatory ULCAA provisions prevail, then Articles of Organization,
+          then these Bylaws, then other ULCAA provisions.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTICLE I -->
+  <div class="article" id="art-1">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-1</span>
+      <span class="article-title">Article I — Membership</span>
+      <span class="article-count">~12 sections</span>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-1.sec-1</span>
+        <span class="section-heading">Membership Classes</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>The Cooperative shall have multiple membership classes:</p>
+        <div class="subsection-item">(a) Cooperative Member — patron member with full participation rights. Contributes labor, revenue, and/or services.</div>
+        <div class="subsection-item">(b) Coworking Member — patron member participating primarily through the cooperative's coworking space and community resources.</div>
+        <div class="subsection-item">(c) Community Participant — access to programming and community events. May participate in governance as determined by the Board.</div>
+        <div class="subsection-item">(d) Investor Member — non-voting member contributing capital. No voting rights unless also qualifying as patron member in another class.</div>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">members_read_directory</span>
+        <span class="policy-ref">members_read_all_agreements</span>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-1.sec-2</span>
+        <span class="section-heading">Members</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>Any natural person or qualifying entity may apply for membership, subject to Board acceptance, upon meeting nine enumerated eligibility requirements:</p>
+        <div class="subsection-item">sub-1 · Age / residency / legal capacity</div>
+        <div class="subsection-item">sub-2 · Ability to supply goods or services, or otherwise patronize</div>
+        <div class="subsection-item">sub-3 · Commitment to ongoing patronage as co-owner</div>
+        <div class="subsection-item">sub-4 · Agreement to purchase one share of Member Stock (Schedule A price)</div>
+        <div class="subsection-item">sub-5 · Agreement to pay Member Dues (Schedule A, subject to Board revision)</div>
+        <div class="subsection-item">sub-6 · Agreement to undertake patronage responsibilities per Bylaws and Membership Agreement</div>
+        <div class="subsection-item">sub-7 · Agreement to participate in governance functions and maintain good standing</div>
+        <div class="subsection-item">sub-8 · Meeting other uniform conditions set by Board</div>
+        <div class="subsection-item">sub-9 · Agreement to abide by Articles, Bylaws, Membership Agreement, and Board policies</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-1.sec-3</span>
+        <span class="section-heading">Admission to Membership</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>
+          Admission by Board invitation, typically following a ~90-day participation period.
+          Applicant executes the Membership Agreement and pays the Member Share price.
+          The Board retains sole discretion over admission decisions.
+        </p>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-1.sec-4</span>
+        <span class="section-heading">Application to Join</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>Written application submitted to the Board. Application is also a request for applicant-level access in the CIS — the record that applicants can read during their admission period.</p>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">applicant_reads_member_agreements</span>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-1.sec-7</span>
+        <span class="section-heading">Inspection Rights</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>
+          A Patron Member shall have the right to inspect the membership list. The membership list
+          shall include name and contact for each active member. Active members may also inspect
+          cooperative books and records in accordance with ULCAA.
+        </p>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">members_read_directory</span>
+        <span class="policy-ref">members_read_org_agents</span>
+        <span class="policy-ref">members_read_all_agreements</span>
+        <span class="policy-ref">members_read_all_sections</span>
+        <span class="policy-ref">members_read_own_events</span>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-1.sec-9</span>
+        <span class="section-heading">Suspension</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>A suspended member retains read access to their own record but not to other members' records. Suspension is temporary; the path to restoration is defined by the Board.</p>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">agents_own_record_select</span>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-1.sec-10</span>
+        <span class="section-heading">Withdrawal / Former Member</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>A former member may read their own historical record — the agreements they signed, their own audit history. Share is redeemed on exit; capital account paid out on board schedule (up to 5 years).</p>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">former_member_reads_own_agreements</span>
+        <span class="policy-ref">members_read_own_resources</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTICLES II–VIII (summarized) -->
+  <div class="article" id="art-2">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-2</span>
+      <span class="article-title">Article II — Meetings of Members</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-2</span>
+        <span class="section-heading">Meetings of Members</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        Annual member meetings. Special meetings on petition of 10% of members or Board resolution.
+        Quorum: majority of Class One members. One member, one vote regardless of contribution level or class.
+        Family meetings: 1st and 3rd Fridays, 3:00 PM MT.
+        <div class="section-truncated">Full text available at techne.institute/legal/bylaws-v2/ · §2.9: Directory contents cited by agents READ policies</div>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">members_read_own_resources</span>
+        <span class="policy-ref">members_read_own_events</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="article" id="art-3">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-3</span>
+      <span class="article-title">Article III — Board of Directors</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-3</span>
+        <span class="section-heading">Board of Directors</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        The Board manages the cooperative's business and affairs. Directors elected by Class One members.
+        Directors have management scope: read all resource records, all role assignments, all agreements.
+        New agreements require a Board motion before they may be published.
+        <div class="section-truncated">Full text at techne.institute/legal/bylaws-v2/ · §III cited by 8 RLS policies across agreements, resources, role_assignments, and audit.events</div>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">directors_read_all_resources</span>
+        <span class="policy-ref">directors_read_all_role_assignments</span>
+        <span class="policy-ref">directors_read_all_events</span>
+        <span class="policy-ref">director_inserts_agreements</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Articles IV–XIV as planned stubs -->
+  <div class="article" id="art-4">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-4</span>
+      <span class="article-title">Article IV — Officers</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-4</span>
+        <span class="section-heading">Officers</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">Officers appointed by the Board. Officers hold the same CIS access permissions as directors for read operations. Operational scope of write access is defined by Board resolution.</div>
+    </div>
+  </div>
+
+  <div class="article" id="art-5">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-5</span>
+      <span class="article-title">Article V — Committees</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-5</span>
+        <span class="section-heading">Committees</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">The Board may establish committees. The Financial Systems Committee (FSC) was established in early 2026 — first meeting March 2026. Committee members hold read access to all active agreements and sections; no write access.</div>
+    </div>
+  </div>
+
+  <div class="article" id="art-6">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-6</span>
+      <span class="article-title">Article VI — Capital Contributions</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-6</span>
+        <span class="section-heading">Capital Contributions</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        Member shares: Class One (Cooperative Member) — $100 one-time share + $100/year dues.
+        All capital contributions recorded as resource rows. Member capital accounts are tracked in the CIS; balances allocated at year-end in proportion to patronage contribution.
+        Taxed as partnership (Subchapter K). Tax distributions prevent phantom income.
+        <div class="section-truncated">Schedule A adopted June 24, 2026 — share prices and dues now set. No-phantom-tax distribution policy incorporated.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="article" id="art-7">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-7</span>
+      <span class="article-title">Article VII — Patronage</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-7</span>
+        <span class="section-heading">Patronage and Allocation</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        Six Primitives (closed at Bylaws level — cannot add a seventh without amendment):
+        HOURS · REVENUE · CASH · OUTPUT · PRESENCE · PROPERTY.
+        Contributions → classified as Primitive → weighted by Program policy → credited to capital account → allocated at year-end → K-1 in March.
+        Default Policy covers emerging work before it resolves into a ratified Program.
+        <div class="section-truncated">See Program Stack Patronage Plan v1 and Member Guide v1 for full archetype weights and policies.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="article" id="art-8">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-8</span>
+      <span class="article-title">Article VIII — Distributions</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-8</span>
+        <span class="section-heading">Distributions</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">Board-declared distributions. No-phantom-tax distribution policy incorporated in Schedule A (adopted June 24, 2026). All distributions recorded in audit.events.</div>
+    </div>
+  </div>
+
+  <!-- Articles IX–XIV compressed -->
+  <div id="art-9"><div class="planned-article">
+    <span class="planned-article-num">bylaws:v2:art-9</span>
+    <span class="planned-article-title">Article IX — Fiscal Year</span>
+    <span class="planned-note">SEEDED · full text at techne.institute/legal/bylaws-v2/</span>
+  </div></div>
+
+  <div id="art-10"><div class="planned-article">
+    <span class="planned-article-num">bylaws:v2:art-10</span>
+    <span class="planned-article-title">Article X — Books and Records</span>
+    <span class="planned-note">SEEDED · full text at techne.institute/legal/bylaws-v2/</span>
+  </div></div>
+
+  <div id="art-11"><div class="planned-article">
+    <span class="planned-article-num">bylaws:v2:art-11</span>
+    <span class="planned-article-title">Article XI — Indemnification</span>
+    <span class="planned-note">SEEDED · full text at techne.institute/legal/bylaws-v2/</span>
+  </div></div>
+
+  <div id="art-12"><div class="planned-article">
+    <span class="planned-article-num">bylaws:v2:art-12</span>
+    <span class="planned-article-title">Article XII — Dissolution</span>
+    <span class="planned-note">SEEDED · full text at techne.institute/legal/bylaws-v2/</span>
+  </div></div>
+
+  <div id="art-13"><div class="planned-article">
+    <span class="planned-article-num">bylaws:v2:art-13</span>
+    <span class="planned-article-title">Article XIII — Amendments</span>
+    <span class="planned-note">SEEDED · full text at techne.institute/legal/bylaws-v2/</span>
+  </div></div>
+
+  <div id="art-14"><div class="planned-article">
+    <span class="planned-article-num">bylaws:v2:art-14</span>
+    <span class="planned-article-title">Article XIV — Conflicts of Interest</span>
+    <span class="planned-note">SEEDED · full text at techne.institute/legal/bylaws-v2/</span>
+  </div></div>
+
+  <!-- Article XV — Public Benefit (prominent) -->
+  <div class="article" id="art-15">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-15</span>
+      <span class="article-title">Article XV — Public Benefit</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-15</span>
+        <span class="section-heading">Public Benefit Purpose</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>
+          <strong>Public benefit:</strong> "Cultivating scenius." The cooperative exists to serve
+          a broader community beyond its members. Public-facing materials — bylaws, hub membership
+          agreement — are available to all, including unauthenticated visitors.
+        </p>
+        <p>
+          Governed by ULCAA § 7-58-104. The public benefit purpose augments every layer of the
+          cooperative's governing documents — from the Articles through to individual Program policies.
+        </p>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">public_reads_bylaws</span>
+        <span class="policy-ref">public_reads_bylaw_sections</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Article XVI — Digital Governance -->
+  <div class="article" id="art-16">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-16</span>
+      <span class="article-title">Article XVI — Digital Governance</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-16</span>
+        <span class="section-heading">Digital Governance and AI Agents</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        The cooperative recognizes AI agents as participants in its information infrastructure.
+        Nou and Dianoia are registered as agent_ai kind agents in the CIS.
+        Their access is governed by the same RLS policies that govern natural persons —
+        with administrator-level permissions granted by Board resolution and recorded in role_assignments.
+      </div>
+    </div>
+  </div>
+
+  <!-- Articles XVII–XVIII -->
+  <div id="art-17"><div class="planned-article">
+    <span class="planned-article-num">bylaws:v2:art-17</span>
+    <span class="planned-article-title">Article XVII — Cooperative Principles</span>
+    <span class="planned-note">SEEDED · ICA principles incorporated by reference</span>
+  </div></div>
+
+  <div class="article" id="art-18">
+    <div class="article-header">
+      <span class="article-num">bylaws:v2:art-18</span>
+      <span class="article-title">Article XVIII — Roles and Access Control</span>
+      <span class="article-count">seeded</span>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-address">bylaws:v2:art-18.sec-1</span>
+        <span class="section-heading">Fifteen Roles</span>
+        <span class="status-badge status-seed">SEEDED</span>
+      </div>
+      <div class="section-body">
+        <p>§18.1 defines eleven cooperative roles (guest, applicant, patron_member, investor_member, suspended_member, former_member, director, officer, committee_member, administrator, nou) and four hub operations roles (hub_applicant, hub_visitor, hub_member, ee_liaison).</p>
+        <p>Administrative writes are always logged. Role grants require a Board motion for director and officer levels. Role revocation is an UPDATE to revoked_at — no role assignment is ever hard-deleted.</p>
+      </div>
+      <div class="policies-cited">
+        <span class="policies-label">RLS cited by:</span>
+        <span class="policy-ref">admin_reads_all_agents</span>
+        <span class="policy-ref">admin_inserts_agents</span>
+        <span class="policy-ref">admin_reads_all_agreements</span>
+        <span class="policy-ref">directors_insert_role_assignments</span>
+        <span class="policy-ref">directors_read_all_events</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Strata / CIS Reference &nbsp;·&nbsp; RegenHub, LCA &nbsp;·&nbsp;
+  <a href="index.html">Overview</a> &nbsp;·&nbsp;
+  <a href="https://techne.coop/legal" target="_blank">Legal</a>
+  &nbsp;·&nbsp; W0 · construction zone
+</footer>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem('strata-theme', html.dataset.theme); } catch(e) {}
+}
+try {
+  const t = localStorage.getItem('strata-theme');
+  if (t) document.documentElement.dataset.theme = t;
+} catch(e) {}
+</script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roles — Strata · RegenHub, LCA</title>
+<style>
+:root{--void:#0c0c0c;--ink:#111111;--surface:#161616;--panel:#1e1e1e;--raised:#242424;--border:#333333;--border-dim:#272727;--gold:#c4956a;--gold-20:rgba(196,149,106,0.20);--gold-12:rgba(196,149,106,0.12);--gold-06:rgba(196,149,106,0.06);--parchment:#f0f0f0;--warm:#d0d0d0;--muted:#9a9a9a;--dim:#666666;--ghost:#444444;--ok:#4ade80;--warn:#fbbf24;--err:#ef4444;--info:#8bbfff;--teal:#7ccfb8;--purple:#a78bfa;--mono:'IBM Plex Mono','JetBrains Mono',Consolas,monospace;--serif:Georgia,'Times New Roman',serif;--sans:Inter,system-ui,sans-serif}
+[data-theme="light"]{--void:#f7f5f0;--ink:#eeece8;--surface:#ffffff;--panel:#f4f1ec;--raised:#ece9e3;--border:#d8d4cc;--border-dim:#e5e2db;--gold:#a07850;--gold-20:rgba(160,120,80,0.20);--gold-12:rgba(160,120,80,0.12);--gold-06:rgba(160,120,80,0.06);--parchment:#1a1a1a;--warm:#333333;--muted:#666666;--dim:#999999;--ghost:#bbbbbb;--ok:#16a34a;--warn:#d97706;--err:#dc2626;--info:#2563eb;--teal:#0d9488;--purple:#7c3aed}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--void);color:var(--warm);font-family:var(--sans);font-size:15px;line-height:1.6}
+.topbar{position:sticky;top:0;z-index:100;background:var(--ink);border-bottom:1px solid var(--border-dim);height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.topbar-brand{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);text-decoration:none}
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar-nav a{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:4px 10px;border-radius:4px;transition:color 0.13s,background 0.13s}
+.topbar-nav a:hover,.topbar-nav a.active{color:var(--gold);background:var(--gold-12)}
+.theme-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:4px;cursor:pointer}
+.theme-btn:hover{border-color:var(--gold);color:var(--gold)}
+.page{max-width:900px;margin:0 auto;padding:0 28px 80px}
+.hero{padding:48px 0 36px;border-bottom:1px solid var(--border-dim)}
+.hero-label{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.hero h1{font-family:var(--serif);font-size:32px;font-weight:normal;color:var(--parchment);line-height:1.25;margin-bottom:12px}
+.hero p{font-size:15px;color:var(--muted);max-width:600px;line-height:1.75}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:10px;border:1px solid;display:inline-flex;align-items:center;gap:6px}
+.badge-draft{color:var(--gold);border-color:var(--gold-20);background:var(--gold-06)}
+.badge-hub{color:var(--purple);border-color:rgba(167,139,250,0.2);background:rgba(167,139,250,0.06)}
+.section{padding:40px 0;border-bottom:1px solid var(--border-dim)}
+.section:last-child{border-bottom:none}
+.section-label{font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.section h2{font-family:var(--serif);font-size:22px;font-weight:normal;color:var(--parchment);margin-bottom:10px}
+.section p{color:var(--muted);font-size:14px;line-height:1.75;max-width:680px}
+.role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:24px}
+.role-card{background:var(--panel);border:1px solid var(--border-dim);border-radius:8px;padding:20px 18px}
+.role-card-coop{border-left:3px solid var(--gold)}
+.role-card-hub{border-left:3px solid var(--purple)}
+.role-name{font-family:var(--mono);font-size:13px;color:var(--parchment);margin-bottom:6px}
+.role-tech{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:0.06em;margin-bottom:12px}
+.role-plain{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.role-caps{display:flex;flex-wrap:wrap;gap:5px}
+.cap{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:3px;letter-spacing:0.04em}
+.cap-r{color:var(--info);background:rgba(139,191,255,0.08);border:1px solid rgba(139,191,255,0.15)}
+.cap-w{color:var(--ok);background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.15)}
+.cap-a{color:var(--gold);background:var(--gold-06);border:1px solid var(--gold-20)}
+.cap-n{color:var(--muted);background:transparent;border:1px solid var(--border-dim)}
+.journey{margin-top:24px;padding:20px;background:var(--panel);border:1px solid var(--border-dim);border-radius:8px;border-left:3px solid var(--teal)}
+.journey-label{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.journey-steps{display:flex;flex-wrap:wrap;gap:0;align-items:center}
+.journey-step{font-family:var(--mono);font-size:11px;color:var(--muted);padding:4px 0}
+.journey-step-active{color:var(--gold)}
+.journey-arrow{color:var(--dim);margin:0 8px;font-size:12px}
+.foot{margin-top:64px;padding-top:28px;border-top:1px solid var(--border-dim);font-family:var(--mono);font-size:10px;color:var(--ghost);letter-spacing:0.08em;text-transform:uppercase;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <a class="topbar-brand" href="/">Strata · RegenHub, LCA</a>
+  <div class="topbar-nav">
+    <a href="/">Overview</a>
+    <a href="/schema.html">Schema</a>
+    <a href="/policies.html">Policies</a>
+    <a href="/roles.html" class="active">Roles</a>
+    <a href="/bylaws.html">Bylaws</a>
+    <a href="/migrations.html">Migrations</a>
+  </div>
+  <div><button class="theme-btn" onclick="toggleTheme()">Light / Dark</button></div>
+</nav>
+
+<main class="page">
+  <div class="hero">
+    <div class="hero-label">Roles reference</div>
+    <h1>15 roles — what each one can see and do</h1>
+    <p>Roles are ecological niches. Each one describes a position in the cooperative's life — what the holder can observe, participate in, and change. Roles are time-bounded grants, not permanent states. They are assigned and revoked by directors, logged in the audit trail.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+      <span class="badge badge-draft">11 cooperative roles · §18.1</span>
+      <span class="badge badge-hub">4 hub operations roles · EE Grant</span>
+    </div>
+  </div>
+
+  <!-- Member journey -->
+  <div class="section">
+    <div class="section-label">The member journey</div>
+    <h2>How roles progress</h2>
+    <p>Membership is a threshold, not an event. Most people arrive as guests — seeing only what is public. The path to full membership moves through invitation, application, and admission by the board.</p>
+
+    <div class="journey">
+      <div class="journey-label">Path to patron membership</div>
+      <div class="journey-steps">
+        <span class="journey-step">guest</span>
+        <span class="journey-arrow">→</span>
+        <span class="journey-step">applicant</span>
+        <span class="journey-arrow">→</span>
+        <span class="journey-step journey-step-active">patron_member</span>
+        <span class="journey-arrow">→ (board vote)</span>
+        <span class="journey-step">director / officer</span>
+      </div>
+    </div>
+    <div class="journey" style="border-left-color:var(--purple);margin-top:12px">
+      <div class="journey-label" style="color:var(--purple)">Hub operations path</div>
+      <div class="journey-steps">
+        <span class="journey-step">hub_visitor</span>
+        <span class="journey-arrow">→</span>
+        <span class="journey-step">hub_applicant</span>
+        <span class="journey-arrow">→</span>
+        <span class="journey-step" style="color:var(--purple)">hub_member</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cooperative roles -->
+  <div class="section">
+    <div class="section-label">Cooperative roles · §18.1 bylaws</div>
+    <h2>Eleven roles for cooperative members</h2>
+    <p>Defined in Bylaws Article 18 §1. Each role is a set of permissions implemented as RLS policies. Having the role does not grant application-level privileges — only database-level row visibility.</p>
+
+    <div class="role-grid">
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Guest</div>
+        <div class="role-tech">guest</div>
+        <div class="role-plain">The public. Any visitor to the cooperative's digital surfaces without a session. Sees only what the cooperative has declared public: the bylaws, the hub membership agreement, public documents.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Public bylaws</span>
+          <span class="cap cap-n">No member data</span>
+          <span class="cap cap-n">No governance docs</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Applicant</div>
+        <div class="role-tech">applicant</div>
+        <div class="role-plain">Someone who has submitted a membership application and is under consideration. Can read the documents they need to understand before joining: bylaws and member agreements. Cannot see other members or governance history.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Bylaws</span>
+          <span class="cap cap-r">Member agreement</span>
+          <span class="cap cap-r">Own record only</span>
+          <span class="cap cap-n">No member directory</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Patron Member</div>
+        <div class="role-tech">patron_member</div>
+        <div class="role-plain">A full voting member. Has paid the $100 share, signed the membership agreement, and been admitted by the board. Can see the member directory, read all cooperative agreements (including minutes and motions), and access their own resource records. One vote among equals.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Member directory</span>
+          <span class="cap cap-r">All agreements</span>
+          <span class="cap cap-r">Own resources</span>
+          <span class="cap cap-r">Own event history</span>
+          <span class="cap cap-w">Own profile</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Investor Member</div>
+        <div class="role-tech">investor_member</div>
+        <div class="role-plain">A capital contributor with a separate member agreement (Class Four). Same read access as patron members for governance. Capital record access scoped to own holdings. No voting unless co-holder of a Class One share.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Member directory</span>
+          <span class="cap cap-r">All agreements</span>
+          <span class="cap cap-r">Own resources</span>
+          <span class="cap cap-n">No voting (default)</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Suspended Member</div>
+        <div class="role-tech">suspended_member</div>
+        <div class="role-plain">A member whose membership has been suspended pending a board resolution. Retains access to their own record and their own event history. Cannot access the member directory, governance documents, or other members' data. Voting rights suspended.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Own record only</span>
+          <span class="cap cap-r">Own events</span>
+          <span class="cap cap-r">Own resources</span>
+          <span class="cap cap-n">No directory</span>
+          <span class="cap cap-n">No governance</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Former Member</div>
+        <div class="role-tech">former_member</div>
+        <div class="role-plain">A member whose membership has ended. Retains access to their own historical records: the agreements they signed, their own agent row (including archived_at), their own event history. Cannot access current member data. Their capital account is settled on the board's redemption schedule.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Own record</span>
+          <span class="cap cap-r">Own agreements</span>
+          <span class="cap cap-r">Own resources</span>
+          <span class="cap cap-r">Own events</span>
+          <span class="cap cap-n">No current members</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Director</div>
+        <div class="role-tech">director</div>
+        <div class="role-plain">An elected board member. Full read access to all records for governance oversight: complete member directory, all agreements, all resource records, all role assignments, and the full audit event log. Can publish new agreements, manage role assignments, and grant/revoke roles.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">All records</span>
+          <span class="cap cap-r">Full event log</span>
+          <span class="cap cap-w">Publish agreements</span>
+          <span class="cap cap-w">Manage roles</span>
+          <span class="cap cap-a">Board governance</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Officer</div>
+        <div class="role-tech">officer</div>
+        <div class="role-plain">Treasurer, Secretary, or President. Operational scope: can update agreement supersession chains, manage role assignments, and write governance records. Same governance read access as directors. Officers may manage roles within their operational scope — the application layer enforces the scope; the policy permits the write.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">All records</span>
+          <span class="cap cap-w">Update agreements</span>
+          <span class="cap cap-w">Manage roles</span>
+          <span class="cap cap-a">Operational scope</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Committee Member</div>
+        <div class="role-tech">committee_member</div>
+        <div class="role-plain">A member serving on a board committee (Financial Systems, Operations, etc.). Director-level read access plus committee-specific materials. Cannot publish new agreements or manage roles — those require director or officer level.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">All agreements</span>
+          <span class="cap cap-r">All members</span>
+          <span class="cap cap-r">All resources</span>
+          <span class="cap cap-n">No role management</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Administrator</div>
+        <div class="role-tech">administrator</div>
+        <div class="role-plain">An operational role for system administration — onboarding agents, seeding data, running migrations, populating embeddings. Full read and write access to all tables. All writes are logged. This role is not a governance role; it is an operational one. Actions taken under this role are especially visible in the audit trail.</div>
+        <div class="role-caps">
+          <span class="cap cap-a">Full read</span>
+          <span class="cap cap-a">Full write</span>
+          <span class="cap cap-a">All tables</span>
+          <span class="cap cap-a">Fully logged</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-coop">
+        <div class="role-name">Nou</div>
+        <div class="role-tech">nou</div>
+        <div class="role-plain">The cooperative's intelligence agent. The nou role grants scoped access to read agreement sections (for citation), write event rows (nou.query_received, nou.answer_returned), and read the member directory for coordination. Nou inherits the invoking user's permissions — it cannot access records that the user themselves cannot access. The role is a permission ceiling, not a bypass.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Agreement sections</span>
+          <span class="cap cap-r">Member directory</span>
+          <span class="cap cap-w">Write events</span>
+          <span class="cap cap-n">No role management</span>
+          <span class="cap cap-n">No resource writes</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Hub roles -->
+  <div class="section">
+    <div class="section-label">Hub operations roles · EE Grant</div>
+    <h2>Four roles for the physical space</h2>
+    <p>The Hub at 1515 Walnut, Boulder operates under the Ethereum Foundation grant (EE Grant). These four roles govern access to hub-specific tables — co-working seats, events, KPI measurements. They are defined in the EE Grant §2 and managed by the hub operations module (Wave 2).</p>
+
+    <div class="role-grid">
+
+      <div class="role-card role-card-hub">
+        <div class="role-name">Hub Visitor</div>
+        <div class="role-tech">hub_visitor</div>
+        <div class="role-plain">Anyone visiting the physical space without a membership. Can see public materials and the event calendar. No access to co-working seat assignments or member data.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Public materials</span>
+          <span class="cap cap-r">Event calendar</span>
+          <span class="cap cap-n">No seats</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-hub">
+        <div class="role-name">Hub Applicant</div>
+        <div class="role-tech">hub_applicant</div>
+        <div class="role-plain">Someone who has submitted a hub membership application. Can read their own application record. Cannot see other applicants or current members' data.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Own application</span>
+          <span class="cap cap-r">Hub agreement</span>
+          <span class="cap cap-n">No other records</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-hub">
+        <div class="role-name">Hub Member</div>
+        <div class="role-tech">hub_member</div>
+        <div class="role-plain">A paying co-working member (Class Two or Class Three). Access to co-working seat assignments, event registration, and hub materials. No access to cooperative governance documents or other members' capital data.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">Seat assignments</span>
+          <span class="cap cap-r">Event registration</span>
+          <span class="cap cap-r">Hub materials</span>
+          <span class="cap cap-n">No governance</span>
+        </div>
+      </div>
+
+      <div class="role-card role-card-hub">
+        <div class="role-name">EE Liaison</div>
+        <div class="role-tech">ee_liaison</div>
+        <div class="role-plain">The Ethereum Foundation's designated contact for grant compliance. Access to aggregate KPI measurements and impact reports — not individual member data. Views return aggregates only; row-level data is not exposed. Defined in EE Grant §4.</div>
+        <div class="role-caps">
+          <span class="cap cap-r">KPI aggregates</span>
+          <span class="cap cap-r">Impact reports</span>
+          <span class="cap cap-n">No individual rows</span>
+          <span class="cap cap-n">No member data</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<div class="page">
+  <div class="foot">
+    <span>Strata · Roles · RegenHub, LCA</span>
+    <span>15 roles · 2 categories</span>
+    <span><a href="/" style="color:inherit;text-decoration:none;">← Overview</a></span>
+  </div>
+</div>
+
+<script>
+(function(){var s=localStorage.getItem('strata-theme');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme: light)').matches)document.documentElement.setAttribute('data-theme','light');})();
+function toggleTheme(){var c=document.documentElement.getAttribute('data-theme');var n=c==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('strata-theme',n);}
+</script>
+</body>
+</html>

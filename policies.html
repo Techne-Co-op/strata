@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Access Policies — Strata / CIS</title>
+<style>
+:root {
+  --gold: #c4956a;
+  --gold-dim: rgba(196,149,106,0.15);
+  --gold-border: rgba(196,149,106,0.3);
+  --teal: #5fa8a0;
+  --teal-dim: rgba(95,168,160,0.12);
+  --blue: #5b8db8;
+  --blue-dim: rgba(91,141,184,0.12);
+  --green: #6a9f6a;
+  --red: #c07060;
+  --muted: #888;
+  --void: #0a0a0b;
+  --ink: #e8e4dc;
+  --surface: #141416;
+  --panel: #1c1c20;
+  --border: rgba(255,255,255,0.08);
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+[data-theme="light"] {
+  --void: #faf8f4;
+  --ink: #1a1a1e;
+  --surface: #f0ece4;
+  --panel: #e8e4dc;
+  --border: rgba(0,0,0,0.1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* NAV */
+nav {
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.nav-brand { color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; }
+.nav-links { display: flex; gap: 1rem; margin-left: auto; flex-wrap: wrap; }
+.nav-links a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+.theme-toggle {
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer; padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono); font-size: 0.7rem; border-radius: 3px;
+  transition: all 0.15s;
+}
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+
+/* LAYOUT */
+.container { max-width: 960px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+/* HERO */
+.hero { margin-bottom: 3rem; }
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--teal);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+.hero h1 {
+  font-size: 2.2rem;
+  font-weight: normal;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+.hero-sub {
+  color: var(--muted);
+  font-size: 1rem;
+  max-width: 620px;
+  margin-bottom: 1.5rem;
+}
+.hero-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.hero-meta span { color: var(--ink); }
+
+/* STAT CHIPS */
+.stat-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+.stat-chip {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+.stat-chip .num {
+  font-size: 1.25rem;
+  color: var(--teal);
+  display: block;
+  line-height: 1.2;
+}
+
+/* SECTION HEADERS */
+.section-header {
+  margin: 2.5rem 0 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+.section-header h2 {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: normal;
+}
+.section-header .count {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* PRINCIPLES BOX */
+.principles {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--teal);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.principles h3 {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--teal);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+.principles ol {
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.principles ol li { margin-bottom: 0.4rem; }
+
+/* HELPER FUNCTIONS */
+.helpers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+.helper-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.helper-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+}
+.helper-sig {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.helper-desc { font-size: 0.85rem; }
+.helper-note {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--teal);
+  margin-top: 0.5rem;
+}
+
+/* POLICY TABLE CARDS */
+.table-section {
+  margin-bottom: 2.5rem;
+}
+.table-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 1rem;
+  background: var(--panel);
+  border-radius: 4px;
+  border-left: 3px solid var(--gold);
+}
+.table-section-header.l2 { border-left-color: var(--blue); }
+.table-section-name {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--gold);
+}
+.table-section-header.l2 .table-section-name { color: var(--blue); }
+.table-section-desc { font-size: 0.85rem; color: var(--muted); }
+.table-section-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.policy-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+.policy-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 4px 0 0 4px;
+}
+.policy-card.select::before { background: var(--green); }
+.policy-card.insert::before { background: var(--gold); }
+.policy-card.update::before { background: var(--blue); }
+.policy-card.delete::before { background: var(--red); }
+
+.policy-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+.policy-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink);
+  flex: 1;
+  min-width: 200px;
+}
+.policy-op {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.op-select { background: rgba(106,159,106,0.15); color: var(--green); }
+.op-insert { background: var(--gold-dim); color: var(--gold); }
+.op-update { background: var(--blue-dim); color: var(--blue); }
+.op-delete { background: rgba(192,112,96,0.15); color: var(--red); }
+
+.policy-citation {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--teal);
+  margin-bottom: 0.5rem;
+}
+.policy-desc { font-size: 0.88rem; color: var(--ink); margin-bottom: 0.5rem; }
+.policy-roles {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.role-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.policy-negative {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--red);
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+.policy-negative::before { content: '✗ '; }
+
+/* ACCESS MATRIX */
+.matrix-wrap { overflow-x: auto; margin-bottom: 2.5rem; }
+.matrix {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  min-width: 720px;
+  width: 100%;
+}
+.matrix th, .matrix td {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.5rem;
+  text-align: center;
+  white-space: nowrap;
+}
+.matrix th {
+  background: var(--panel);
+  color: var(--muted);
+  font-weight: normal;
+}
+.matrix th.table-col {
+  text-align: left;
+  color: var(--ink);
+}
+.matrix td.role-label {
+  text-align: left;
+  color: var(--ink);
+  background: var(--panel);
+}
+.can-r { color: var(--green); }
+.can-w { color: var(--gold); }
+.can-rw { color: var(--teal); }
+.can-a { color: var(--blue); }
+.no-access { color: var(--border); }
+.matrix tr:hover td { background: var(--surface); }
+.matrix-caption {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+/* NO-DELETE BOX */
+.no-delete-box {
+  background: rgba(192,112,96,0.07);
+  border: 1px solid rgba(192,112,96,0.25);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  margin-bottom: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--red);
+}
+.no-delete-box strong { display: block; margin-bottom: 0.35rem; font-size: 0.82rem; }
+
+/* MEMBRANE NARRATIVE */
+.narrative {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+.narrative p { margin-bottom: 0.75rem; }
+.narrative p:last-child { margin-bottom: 0; }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Strata / CIS</span>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="schema.html">Schema</a>
+    <a href="policies.html" class="active">Policies</a>
+    <a href="roles.html">Roles</a>
+    <a href="bylaws.html">Bylaws</a>
+    <a href="migrations.html">Migrations</a>
+    <button class="theme-toggle" onclick="toggleTheme()">◐</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Access Policies — Row-Level Security</div>
+    <h1>What each role can see<br>and what it cannot</h1>
+    <p class="hero-sub">
+      Every row in every table is governed by a membrane — a set of PostgreSQL Row-Level
+      Security policies derived from the cooperative's bylaws. What you can read is what
+      the community has chosen to make visible to you.
+    </p>
+    <div class="hero-meta">
+      28 policies &nbsp;·&nbsp; 6 tables &nbsp;·&nbsp;
+      <span>cite-as-you-enforce discipline</span>
+      &nbsp;·&nbsp; default-deny posture
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-chip"><span class="num">28</span>RLS policies</div>
+    <div class="stat-chip"><span class="num">6</span>tables covered</div>
+    <div class="stat-chip"><span class="num">3</span>helper functions</div>
+    <div class="stat-chip"><span class="num">15</span>roles governed</div>
+    <div class="stat-chip"><span class="num">0</span>DELETE policies</div>
+  </div>
+
+  <div class="narrative">
+    <p>
+      A cell membrane is not a wall — it is a selective passage. Water enters freely; certain
+      proteins pass only in one direction; some signals require a key. The CIS access layer
+      works the same way. Every table starts completely closed. A row not matched by a
+      permissive policy is invisible — as if it does not exist.
+    </p>
+    <p>
+      Each policy that opens a passage carries a comment naming the bylaw section that
+      authorizes it. This is the <em>cite-as-you-enforce</em> discipline: the database itself
+      is a governance artifact. When the bylaws change, the policy comment becomes a revision
+      signal. The technical and the legal stay coupled — not by convention, but by design.
+    </p>
+    <p>
+      No row can ever be hard-deleted. Soft deletion via <code>archived_at</code> timestamp
+      is an UPDATE, covered by update policies. The audit stream records every state change.
+      What has been written stays written.
+    </p>
+  </div>
+
+  <div class="principles">
+    <h3>Five Design Principles</h3>
+    <ol>
+      <li><strong>Default deny.</strong> RLS enabled on every table. No table is open by default.</li>
+      <li><strong>Cite-as-you-enforce.</strong> Every policy comment names the bylaw or PRD section that justifies it.</li>
+      <li><strong>Helper-function isolation.</strong> Role lookups run as SECURITY DEFINER to prevent recursive RLS evaluation.</li>
+      <li><strong>Negative tests required.</strong> Each policy documents its failing case — what should not be permitted.</li>
+      <li><strong>No hard deletes.</strong> Revocation and archiving are always UPDATE operations. DELETE policies: zero.</li>
+    </ol>
+  </div>
+
+  <!-- HELPER FUNCTIONS -->
+  <div class="section-header">
+    <h2>Helper Functions</h2>
+    <span class="count">3 SECURITY DEFINER functions</span>
+  </div>
+
+  <div class="helpers-grid">
+    <div class="helper-card">
+      <div class="helper-name">has_role()</div>
+      <div class="helper-sig">has_role(p_role TEXT) → BOOLEAN</div>
+      <div class="helper-desc">
+        True if the invoking auth user holds the named role and it has not been revoked.
+        The session's role is checked against <code>role_assignments</code>.
+      </div>
+      <div class="helper-note">SECURITY DEFINER · bypasses RLS on role_assignments</div>
+    </div>
+    <div class="helper-card">
+      <div class="helper-name">has_any_role()</div>
+      <div class="helper-sig">has_any_role(p_roles TEXT[]) → BOOLEAN</div>
+      <div class="helper-desc">
+        True if the invoking user holds any role in the provided array.
+        Used in policies that permit several roles the same access path.
+      </div>
+      <div class="helper-note">SECURITY DEFINER · bypasses RLS on role_assignments</div>
+    </div>
+    <div class="helper-card">
+      <div class="helper-name">agent_id()</div>
+      <div class="helper-sig">agent_id() → UUID</div>
+      <div class="helper-desc">
+        Resolves the invoking auth user's <code>agents.id</code>. Used to scope
+        reads to "own record" without exposing the full agents table.
+        Returns NULL if no agent row exists.
+      </div>
+      <div class="helper-note">SECURITY DEFINER · prevents recursive policy evaluation</div>
+    </div>
+  </div>
+
+  <!-- ROLE × TABLE MATRIX -->
+  <div class="section-header">
+    <h2>Access Matrix</h2>
+    <span class="count">role × table</span>
+  </div>
+
+  <p class="matrix-caption">
+    R = read own · RR = read all · W = write · A = admin (all ops) · — = no access
+  </p>
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th class="table-col">Role</th>
+          <th>agents</th>
+          <th>agreements</th>
+          <th>agreement_sections</th>
+          <th>resources</th>
+          <th>role_assignments</th>
+          <th>audit.events</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="role-label">guest (unauth)</td>
+          <td class="no-access">—</td>
+          <td class="can-r">R (bylaws)</td>
+          <td class="can-r">R (bylaws)</td>
+          <td class="no-access">—</td>
+          <td class="no-access">—</td>
+          <td class="no-access">—</td>
+        </tr>
+        <tr>
+          <td class="role-label">applicant</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (bylaws + MA)</td>
+          <td class="can-r">R (bylaws + MA)</td>
+          <td class="no-access">—</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own events)</td>
+        </tr>
+        <tr>
+          <td class="role-label">patron_member</td>
+          <td class="can-r">R (own + directory)</td>
+          <td class="can-r">RR (all active)</td>
+          <td class="can-r">RR (all)</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own events)</td>
+        </tr>
+        <tr>
+          <td class="role-label">investor_member</td>
+          <td class="can-r">R (own + directory)</td>
+          <td class="can-r">RR (all active)</td>
+          <td class="can-r">RR (all)</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own events)</td>
+        </tr>
+        <tr>
+          <td class="role-label">suspended_member</td>
+          <td class="can-r">R (own)</td>
+          <td class="no-access">—</td>
+          <td class="no-access">—</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own events)</td>
+        </tr>
+        <tr>
+          <td class="role-label">former_member</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (bylaws + MA)</td>
+          <td class="no-access">—</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own events)</td>
+        </tr>
+        <tr>
+          <td class="role-label">committee_member</td>
+          <td class="can-r">R (own + directory)</td>
+          <td class="can-r">RR (all active)</td>
+          <td class="can-r">RR (all)</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (own events)</td>
+        </tr>
+        <tr>
+          <td class="role-label">officer</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+        </tr>
+        <tr>
+          <td class="role-label">director</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+          <td class="can-rw">RR + W</td>
+        </tr>
+        <tr>
+          <td class="role-label">administrator</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+        </tr>
+        <tr>
+          <td class="role-label">nou (AI agent)</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+          <td class="can-a">A</td>
+          <td class="can-rw">RR + W</td>
+        </tr>
+        <tr>
+          <td class="role-label">hub_applicant</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (bylaws)</td>
+          <td class="can-r">R (bylaws)</td>
+          <td class="no-access">—</td>
+          <td class="can-r">R (own)</td>
+          <td class="no-access">—</td>
+        </tr>
+        <tr>
+          <td class="role-label">hub_visitor</td>
+          <td class="no-access">—</td>
+          <td class="can-r">R (bylaws)</td>
+          <td class="can-r">R (bylaws)</td>
+          <td class="no-access">—</td>
+          <td class="no-access">—</td>
+          <td class="no-access">—</td>
+        </tr>
+        <tr>
+          <td class="role-label">hub_member</td>
+          <td class="can-r">R (own)</td>
+          <td class="can-r">R (hub MA)</td>
+          <td class="can-r">R (hub MA)</td>
+          <td class="no-access">—</td>
+          <td class="can-r">R (own)</td>
+          <td class="no-access">—</td>
+        </tr>
+        <tr>
+          <td class="role-label">ee_liaison</td>
+          <td class="no-access">—</td>
+          <td class="no-access">—</td>
+          <td class="no-access">—</td>
+          <td class="no-access">— (views, W2)</td>
+          <td class="no-access">—</td>
+          <td class="no-access">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="no-delete-box">
+    <strong>No DELETE policies exist on any table.</strong>
+    Hard deletes are prohibited by substrate PRD §05 and ADR-003. Soft deletion is an UPDATE
+    to the <code>archived_at</code> column. The audit stream records every state transition.
+    Any DELETE attempt by any role returns "permission denied."
+  </div>
+
+  <!-- POLICIES BY TABLE -->
+
+  <!-- agents -->
+  <div class="table-section">
+    <div class="table-section-header">
+      <span class="table-section-name">public.agents</span>
+      <span class="table-section-desc">Natural persons, legal entities, AI agents</span>
+      <span class="table-section-count">7 policies</span>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">agents_own_record_select</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Any authenticated user reads their own agent row. Foundation of the auth flow — login resolves the user's agent and role assignments by querying this record first.</div>
+      <div class="policy-citation">auth flow requirement (no bylaw citation needed)</div>
+      <div class="policy-roles"><span class="role-tag">authenticated</span></div>
+      <div class="policy-negative">Unauthenticated request returns no rows.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">members_read_directory</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Active voting members may read all active natural agents — the membership directory. Only kind='natural' rows, only non-archived. Legal entities and AI agents are excluded from this path.</div>
+      <div class="policy-citation">§1.7 Inspection rights · §2.9 Directory contents</div>
+      <div class="policy-roles">
+        <span class="role-tag">patron_member</span><span class="role-tag">investor_member</span>
+        <span class="role-tag">director</span><span class="role-tag">officer</span>
+        <span class="role-tag">committee_member</span><span class="role-tag">administrator</span>
+      </div>
+      <div class="policy-negative">An applicant cannot enumerate other agents.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">members_read_org_agents</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Members may inspect the list of AI agents and legal entities that participate in the cooperative's operations. Covers Nou, Dianoia, and RegenHub-the-agent.</div>
+      <div class="policy-citation">§1.7 Inspection rights · §18.1 AI and legal entity transparency</div>
+      <div class="policy-roles">
+        <span class="role-tag">patron_member</span><span class="role-tag">investor_member</span>
+        <span class="role-tag">director</span><span class="role-tag">officer</span>
+        <span class="role-tag">committee_member</span><span class="role-tag">administrator</span>
+      </div>
+      <div class="policy-negative">An applicant cannot enumerate legal or agent_ai rows.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">admin_reads_all_agents</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Administrators read all agent rows, including archived, for audit and governance purposes.</div>
+      <div class="policy-citation">§18.1 Administrative access is logged and audited</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span></div>
+    </div>
+
+    <div class="policy-card insert">
+      <div class="policy-header">
+        <span class="policy-name">admin_inserts_agents</span>
+        <span class="policy-op op-insert">INSERT</span>
+      </div>
+      <div class="policy-desc">Administrators may insert new agent rows — onboarding new members, registering system agents. All inserts are logged to audit.events.</div>
+      <div class="policy-citation">§18.1 Administrative writes are always logged</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span></div>
+      <div class="policy-negative">A patron member cannot insert a new agent row.</div>
+    </div>
+
+    <div class="policy-card update">
+      <div class="policy-header">
+        <span class="policy-name">admin_updates_agents</span>
+        <span class="policy-op op-update">UPDATE</span>
+      </div>
+      <div class="policy-desc">Administrators may update any agent row. Column-level restrictions (cannot change kind or auth_user_id) are enforced at the application layer in Wave 1.</div>
+      <div class="policy-citation">§18.1 Administrative writes are always logged</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span></div>
+    </div>
+
+    <div class="policy-card update">
+      <div class="policy-header">
+        <span class="policy-name">member_updates_own_agent</span>
+        <span class="policy-op op-update">UPDATE</span>
+      </div>
+      <div class="policy-desc">Members may update their own agent row — display name, metadata, contact information. Cannot change auth_user_id or kind (application layer enforced).</div>
+      <div class="policy-citation">§18.1 Members control their own profile data</div>
+      <div class="policy-roles">
+        <span class="role-tag">patron_member</span><span class="role-tag">investor_member</span>
+        <span class="role-tag">director</span><span class="role-tag">officer</span>
+        <span class="role-tag">committee_member</span><span class="role-tag">administrator</span>
+        <span class="role-tag">applicant</span><span class="role-tag">hub_member</span>
+      </div>
+      <div class="policy-negative">A patron member cannot update another member's record.</div>
+    </div>
+  </div>
+
+  <!-- agreements -->
+  <div class="table-section">
+    <div class="table-section-header">
+      <span class="table-section-name">public.agreements</span>
+      <span class="table-section-desc">Bylaws, membership agreements, motions, hub agreements</span>
+      <span class="table-section-count">7 policies</span>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">public_reads_bylaws</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">The bylaws are a public document. Any reader — including unauthenticated visitors — may read bylaws and hub_member_agreement rows. Does not expose private motions or grant documents.</div>
+      <div class="policy-citation">§XV Public-facing materials available to all</div>
+      <div class="policy-roles"><span class="role-tag">everyone (including unauthenticated)</span></div>
+      <div class="policy-negative">This does not expose internal governance motions.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">applicant_reads_member_agreements</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Applicants may read agreements they may be asked to sign: the member agreement and bylaws. Does not include internal governance motions.</div>
+      <div class="policy-citation">§1.4 Applicant access rights</div>
+      <div class="policy-roles"><span class="role-tag">applicant</span></div>
+      <div class="policy-negative">An applicant cannot read internal governance motions.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">members_read_all_agreements</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Active members may read all non-archived agreements, including motions, meeting minutes, and grant documents. Suspended members are excluded.</div>
+      <div class="policy-citation">§1.7 Inspection rights · §18.1 Member access to governance records</div>
+      <div class="policy-roles">
+        <span class="role-tag">patron_member</span><span class="role-tag">investor_member</span>
+        <span class="role-tag">director</span><span class="role-tag">officer</span>
+        <span class="role-tag">committee_member</span><span class="role-tag">administrator</span>
+      </div>
+      <div class="policy-negative">A suspended member cannot read governance documents.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">former_member_reads_own_agreements</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Former members retain access to their own historical agreements — the membership agreement they signed, and bylaws. Scoped to public agreement kinds only.</div>
+      <div class="policy-citation">§1.10 Former member access rights</div>
+      <div class="policy-roles"><span class="role-tag">former_member</span></div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">admin_reads_all_agreements</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Administrators read all agreements, including archived versions. Enables audit, version tracking, and superseded chain inspection.</div>
+      <div class="policy-citation">§18.1 Administrative access logged and audited</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span></div>
+    </div>
+
+    <div class="policy-card insert">
+      <div class="policy-header">
+        <span class="policy-name">director_inserts_agreements</span>
+        <span class="policy-op op-insert">INSERT</span>
+      </div>
+      <div class="policy-desc">New agreements are published by directors or administrators following a ratified motion. The motion requirement is enforced at the application layer; the policy permits the write by authorized roles.</div>
+      <div class="policy-citation">§III Director authority · §18.1 Governance motions</div>
+      <div class="policy-roles"><span class="role-tag">director</span><span class="role-tag">officer</span><span class="role-tag">administrator</span></div>
+      <div class="policy-negative">A patron member cannot publish a new agreement.</div>
+    </div>
+
+    <div class="policy-card update">
+      <div class="policy-header">
+        <span class="policy-name">director_updates_agreements</span>
+        <span class="policy-op op-update">UPDATE</span>
+      </div>
+      <div class="policy-desc">Updates to agreements — setting superseded_by, updating document_uri, archiving — are administrative operations. Officers may update the superseded_by chain when a new version is ratified.</div>
+      <div class="policy-citation">§18.1 Version chain maintenance</div>
+      <div class="policy-roles"><span class="role-tag">director</span><span class="role-tag">officer</span><span class="role-tag">administrator</span></div>
+    </div>
+  </div>
+
+  <!-- agreement_sections -->
+  <div class="table-section">
+    <div class="table-section-header">
+      <span class="table-section-name">public.agreement_sections</span>
+      <span class="table-section-desc">Stable-addressed text blocks of every agreement</span>
+      <span class="table-section-count">6 policies</span>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">public_reads_bylaw_sections</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Bylaw sections are public. Any reader may retrieve the full text of bylaws and hub member agreement sections. This is the L3 reference plane — what makes Nou's citations linkable.</div>
+      <div class="policy-citation">§XV Public-facing materials</div>
+      <div class="policy-roles"><span class="role-tag">everyone (including unauthenticated)</span></div>
+      <div class="policy-negative">Sections of motion agreements are not returned to unauthenticated readers.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">members_read_all_sections</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Active members may read all agreement sections, enabling the agreements browser and Nou's retrieval pipeline. Includes sections of motions and minutes.</div>
+      <div class="policy-citation">§1.7 Member inspection rights</div>
+      <div class="policy-roles">
+        <span class="role-tag">patron_member</span><span class="role-tag">investor_member</span>
+        <span class="role-tag">director</span><span class="role-tag">officer</span>
+        <span class="role-tag">committee_member</span><span class="role-tag">administrator</span>
+      </div>
+      <div class="policy-negative">An applicant cannot read internal motion sections.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">applicant_reads_member_agreement_sections</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Applicants read sections of agreements they may be asked to sign: bylaws and member agreement sections. Scoped to active (non-archived) agreements of those kinds.</div>
+      <div class="policy-citation">§1.4 Applicant access rights</div>
+      <div class="policy-roles"><span class="role-tag">applicant</span></div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">admin_reads_all_sections</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Administrators read all agreement sections, including sections of archived agreements, for audit and version tracking.</div>
+      <div class="policy-citation">§18.1 Administrative access</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span></div>
+    </div>
+
+    <div class="policy-card insert">
+      <div class="policy-header">
+        <span class="policy-name">admin_writes_sections</span>
+        <span class="policy-op op-insert">INSERT</span>
+      </div>
+      <div class="policy-desc">Section rows are written by the ingestion pipeline (administrator-scoped) and by governance processes (director). The embedding column is populated async by the harness, also as administrator.</div>
+      <div class="policy-citation">§18.1 Section ingestion and governance process</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span><span class="role-tag">director</span><span class="role-tag">officer</span></div>
+      <div class="policy-negative">A patron member cannot insert or update a bylaw section.</div>
+    </div>
+
+    <div class="policy-card update">
+      <div class="policy-header">
+        <span class="policy-name">admin_updates_sections</span>
+        <span class="policy-op op-update">UPDATE</span>
+      </div>
+      <div class="policy-desc">Section updates — correcting text, adding embeddings, superseding with new address — are restricted to administrators, directors, and officers.</div>
+      <div class="policy-citation">§18.1 Administrative section management</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span><span class="role-tag">director</span><span class="role-tag">officer</span></div>
+    </div>
+  </div>
+
+  <!-- resources -->
+  <div class="table-section">
+    <div class="table-section-header">
+      <span class="table-section-name">public.resources</span>
+      <span class="table-section-desc">Capital balances, equity shares, CLOUD credits</span>
+      <span class="table-section-count">4 policies</span>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">members_read_own_resources</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Members may read their own resource records — capital balance, equity shares, CLOUD credits. Scoped to rows where owner_agent_id matches the caller's agent ID.</div>
+      <div class="policy-citation">§2.9 Member right to inspect own records · §18.1 Resource access</div>
+      <div class="policy-roles">
+        <span class="role-tag">patron_member</span><span class="role-tag">investor_member</span>
+        <span class="role-tag">director</span><span class="role-tag">officer</span>
+        <span class="role-tag">committee_member</span><span class="role-tag">administrator</span>
+        <span class="role-tag">former_member</span><span class="role-tag">suspended_member</span>
+      </div>
+      <div class="policy-negative">A patron member cannot see another member's capital balance.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">directors_read_all_resources</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Directors and officers may read all resource records for governance and financial oversight. Required for quorum checks, patronage calculations, and financial reports.</div>
+      <div class="policy-citation">§III Director authority · §18.1 Financial oversight</div>
+      <div class="policy-roles"><span class="role-tag">director</span><span class="role-tag">officer</span><span class="role-tag">administrator</span></div>
+      <div class="policy-negative">A patron member cannot enumerate all capital balances.</div>
+    </div>
+
+    <div class="policy-card insert">
+      <div class="policy-header">
+        <span class="policy-name">admin_writes_resources</span>
+        <span class="policy-op op-insert">INSERT</span>
+      </div>
+      <div class="policy-desc">Resource records are written by the patronage accounting module (Wave 1) under administrator oversight. No member self-modifies resource rows — all changes are events in audit.events.</div>
+      <div class="policy-citation">§18.1 Patronage accounting module authority</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span></div>
+      <div class="policy-negative">A patron member cannot insert a resource row.</div>
+    </div>
+
+    <div class="policy-card update">
+      <div class="policy-header">
+        <span class="policy-name">admin_updates_resources</span>
+        <span class="policy-op op-update">UPDATE</span>
+      </div>
+      <div class="policy-desc">Resource balance updates are administrative operations. Every update triggers an audit event; the event is the record of the change.</div>
+      <div class="policy-citation">§18.1 Administrative resource management</div>
+      <div class="policy-roles"><span class="role-tag">administrator</span></div>
+    </div>
+  </div>
+
+  <!-- role_assignments -->
+  <div class="table-section">
+    <div class="table-section-header">
+      <span class="table-section-name">public.role_assignments</span>
+      <span class="table-section-desc">Time-bounded role grants, the auth foundation</span>
+      <span class="table-section-count">4 policies</span>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">own_role_assignments_select</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Any authenticated user reads their own role assignments. Required for the auth flow: the session-start query reads active role assignments to populate the session context.</div>
+      <div class="policy-citation">auth flow requirement</div>
+      <div class="policy-roles"><span class="role-tag">authenticated</span></div>
+      <div class="policy-negative">A patron member cannot enumerate other members' role assignments.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">directors_read_all_role_assignments</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Directors, officers, and administrators may read all role assignments for governance oversight — quorum checks, roster audits, election eligibility verification.</div>
+      <div class="policy-citation">§III Director authority · §18.1 Governance oversight</div>
+      <div class="policy-roles"><span class="role-tag">director</span><span class="role-tag">officer</span><span class="role-tag">administrator</span></div>
+      <div class="policy-negative">A committee member cannot enumerate all role assignments.</div>
+    </div>
+
+    <div class="policy-card insert">
+      <div class="policy-header">
+        <span class="policy-name">directors_insert_role_assignments</span>
+        <span class="policy-op op-insert">INSERT</span>
+      </div>
+      <div class="policy-desc">Role grants are administrative actions, always logged. Directors may grant member roles. The motion-backed grant requirement for director/officer roles is enforced at the application layer; this policy permits the write by authorized roles.</div>
+      <div class="policy-citation">§18.1 Role grants are administrative, always logged</div>
+      <div class="policy-roles"><span class="role-tag">director</span><span class="role-tag">officer</span><span class="role-tag">administrator</span></div>
+      <div class="policy-negative">A patron member cannot assign roles to other agents.</div>
+    </div>
+
+    <div class="policy-card update">
+      <div class="policy-header">
+        <span class="policy-name">directors_update_role_assignments</span>
+        <span class="policy-op op-update">UPDATE</span>
+      </div>
+      <div class="policy-desc">Revocation is an UPDATE — setting revoked_at to the current timestamp. No row is ever deleted; the revocation timestamp is the permanent record.</div>
+      <div class="policy-citation">§18.1 Revocation as audit record</div>
+      <div class="policy-roles"><span class="role-tag">director</span><span class="role-tag">officer</span><span class="role-tag">administrator</span></div>
+      <div class="policy-negative">A patron member cannot revoke another member's role.</div>
+    </div>
+  </div>
+
+  <!-- audit.events -->
+  <div class="table-section">
+    <div class="table-section-header l2">
+      <span class="table-section-name" style="color:var(--blue)">audit.events</span>
+      <span class="table-section-desc">Append-only cooperative business record</span>
+      <span class="table-section-count">3 policies</span>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">members_read_own_events</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Members may read events where they are the actor — their own interaction log. Enables members to audit their own history.</div>
+      <div class="policy-citation">§2.9 Right to inspect own records · §18.1 Personal audit access</div>
+      <div class="policy-roles">
+        <span class="role-tag">patron_member</span><span class="role-tag">investor_member</span>
+        <span class="role-tag">director</span><span class="role-tag">officer</span>
+        <span class="role-tag">committee_member</span><span class="role-tag">administrator</span>
+        <span class="role-tag">former_member</span><span class="role-tag">suspended_member</span>
+        <span class="role-tag">applicant</span>
+      </div>
+      <div class="policy-negative">A patron member cannot read another member's event history.</div>
+    </div>
+
+    <div class="policy-card select">
+      <div class="policy-header">
+        <span class="policy-name">directors_read_all_events</span>
+        <span class="policy-op op-select">SELECT</span>
+      </div>
+      <div class="policy-desc">Directors and administrators may read the full event log for governance review, audit trails, and Nou's citation verification. This is the cooperative's primary business record.</div>
+      <div class="policy-citation">§III Director authority · §18.1 Audit and governance review</div>
+      <div class="policy-roles"><span class="role-tag">director</span><span class="role-tag">officer</span><span class="role-tag">administrator</span></div>
+      <div class="policy-negative">A patron member cannot enumerate the full event log.</div>
+    </div>
+
+    <div class="policy-card insert">
+      <div class="policy-header">
+        <span class="policy-name">authenticated_insert_events</span>
+        <span class="policy-op op-insert">INSERT</span>
+      </div>
+      <div class="policy-desc">Authenticated users may write events — for application-layer event logging: nou.query_received, access.denied, state transitions. The append-only trigger at the database layer prevents any UPDATE or DELETE regardless of this policy.</div>
+      <div class="policy-citation">append-only discipline · substrate PRD §05</div>
+      <div class="policy-roles"><span class="role-tag">authenticated</span></div>
+      <div class="policy-negative">No event row can ever be updated or deleted by any role — DB triggers enforce this.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Strata / CIS Reference &nbsp;·&nbsp; RegenHub, LCA &nbsp;·&nbsp;
+  <a href="index.html">Overview</a> &nbsp;·&nbsp;
+  <a href="https://techne.coop/legal" target="_blank">Legal</a>
+  &nbsp;·&nbsp; W0 · construction zone
+</footer>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem('strata-theme', html.dataset.theme); } catch(e) {}
+}
+try {
+  const t = localStorage.getItem('strata-theme');
+  if (t) document.documentElement.dataset.theme = t;
+} catch(e) {}
+</script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migrations — Strata / CIS</title>
+<style>
+:root {
+  --gold: #c4956a;
+  --gold-dim: rgba(196,149,106,0.12);
+  --gold-border: rgba(196,149,106,0.3);
+  --teal: #5fa8a0;
+  --teal-dim: rgba(95,168,160,0.1);
+  --blue: #5b8db8;
+  --blue-dim: rgba(91,141,184,0.12);
+  --green: #6a9f6a;
+  --purple: #8a74b0;
+  --muted: #888;
+  --void: #0a0a0b;
+  --ink: #e8e4dc;
+  --surface: #141416;
+  --panel: #1c1c20;
+  --border: rgba(255,255,255,0.08);
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+[data-theme="light"] {
+  --void: #faf8f4;
+  --ink: #1a1a1e;
+  --surface: #f0ece4;
+  --panel: #e8e4dc;
+  --border: rgba(0,0,0,0.1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+nav {
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+  font-family: var(--font-mono); font-size: 0.75rem;
+}
+.nav-brand { color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; }
+.nav-links { display: flex; gap: 1rem; margin-left: auto; flex-wrap: wrap; }
+.nav-links a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+.theme-toggle {
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer; padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono); font-size: 0.7rem; border-radius: 3px;
+}
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+
+.container { max-width: 960px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+.hero { margin-bottom: 3rem; }
+.hero-eyebrow {
+  font-family: var(--font-mono); font-size: 0.7rem;
+  color: var(--purple); letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+.hero h1 { font-size: 2.2rem; font-weight: normal; line-height: 1.25; margin-bottom: 1rem; }
+.hero-sub { color: var(--muted); font-size: 1rem; max-width: 640px; margin-bottom: 1.5rem; }
+.hero-meta {
+  font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted);
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+}
+.hero-meta span { color: var(--ink); }
+
+.stat-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.stat-chip {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 4px; padding: 0.5rem 1rem;
+  font-family: var(--font-mono); font-size: 0.72rem;
+}
+.stat-chip .num { font-size: 1.25rem; color: var(--purple); display: block; line-height: 1.2; }
+
+/* WAVE PROGRESS BAR */
+.wave-track {
+  display: flex;
+  gap: 0;
+  margin-bottom: 3rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.wave-node {
+  flex: 1;
+  padding: 1rem 0.75rem;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  text-align: center;
+  position: relative;
+}
+.wave-node:last-child { border-right: none; }
+.wave-node.active { background: var(--gold-dim); }
+.wave-node.active .wave-label { color: var(--gold); }
+.wave-node.done { background: rgba(95,168,160,0.07); }
+.wave-node.done .wave-label { color: var(--teal); }
+.wave-num {
+  font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--muted); display: block; margin-bottom: 0.2rem;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.wave-label {
+  font-family: var(--font-mono); font-size: 0.72rem;
+  color: var(--muted); display: block;
+}
+.wave-node.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gold);
+}
+.wave-pip {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted); margin: 0 auto 0.35rem;
+  display: block;
+}
+.wave-node.active .wave-pip {
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+  animation: pip-pulse 2s ease-in-out infinite;
+}
+@keyframes pip-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--gold); }
+  50% { opacity: 0.5; box-shadow: 0 0 10px var(--gold); }
+}
+
+/* SECTION HEADER */
+.section-header {
+  margin: 2.5rem 0 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: baseline; gap: 0.75rem;
+}
+.section-header h2 {
+  font-family: var(--font-mono); font-size: 0.8rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--purple); font-weight: normal;
+}
+.section-header .count {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted);
+}
+
+/* STATUS BADGES */
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono); font-size: 0.65rem;
+  padding: 0.15rem 0.45rem; border-radius: 3px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.badge-applied { background: rgba(95,168,160,0.15); color: var(--teal); border: 1px solid rgba(95,168,160,0.3); }
+.badge-active { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+.badge-planned { background: rgba(138,116,176,0.12); color: var(--purple); border: 1px solid rgba(138,116,176,0.3); }
+
+/* MIGRATION CARDS */
+.migration-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+.migration-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 3px;
+  border-radius: 4px 0 0 4px;
+}
+.migration-card.applied::before { background: var(--teal); }
+.migration-card.planned::before { background: var(--purple); background: repeating-linear-gradient(45deg, var(--purple) 0, var(--purple) 2px, transparent 2px, transparent 6px); }
+
+.migration-header {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  margin-bottom: 0.75rem; flex-wrap: wrap;
+}
+.migration-id {
+  font-family: var(--font-mono); font-size: 0.78rem;
+  color: var(--teal); flex: 1; min-width: 240px;
+}
+.migration-card.planned .migration-id { color: var(--purple); opacity: 0.8; }
+.migration-date {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted);
+}
+.migration-title {
+  font-size: 1rem; font-weight: normal; margin-bottom: 0.5rem;
+}
+.migration-desc { font-size: 0.9rem; color: var(--ink); margin-bottom: 1rem; }
+
+.migration-detail {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.detail-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.35rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+.detail-label { color: var(--muted); display: block; }
+.detail-val { color: var(--ink); }
+
+.migration-introduces {
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+}
+.introduces-label {
+  font-family: var(--font-mono); font-size: 0.68rem;
+  color: var(--muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.introduces-list {
+  display: flex; gap: 0.4rem; flex-wrap: wrap;
+}
+.intro-tag {
+  font-family: var(--font-mono); font-size: 0.65rem;
+  padding: 0.15rem 0.4rem; border-radius: 3px;
+  background: var(--surface); color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+/* WAVE ROADMAP */
+.wave-section {
+  margin-bottom: 1.25rem;
+}
+.wave-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.wave-card.active-wave {
+  border-color: rgba(196,149,106,0.3);
+  background: var(--gold-dim);
+}
+.wave-card.planned-wave {
+  border: 2px dashed rgba(138,116,176,0.25);
+  opacity: 0.7;
+}
+.wave-card-header {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-bottom: 0.75rem; flex-wrap: wrap;
+}
+.wave-id {
+  font-family: var(--font-mono); font-size: 0.9rem;
+  color: var(--gold); min-width: 30px;
+}
+.wave-card.planned-wave .wave-id { color: var(--purple); }
+.wave-name { font-size: 1rem; font-weight: normal; flex: 1; }
+.wave-desc { font-size: 0.88rem; color: var(--muted); margin-bottom: 0.75rem; }
+.wave-migrations {
+  display: flex; gap: 0.4rem; flex-wrap: wrap;
+}
+.wave-mig {
+  font-family: var(--font-mono); font-size: 0.65rem;
+  padding: 0.15rem 0.4rem; border-radius: 3px;
+  background: var(--surface); color: var(--teal);
+  border: 1px solid rgba(95,168,160,0.2);
+}
+.wave-card.planned-wave .wave-mig { color: var(--purple); border-color: rgba(138,116,176,0.2); }
+
+/* NARRATIVE */
+.narrative {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1.5rem; margin-bottom: 2.5rem;
+  font-size: 0.95rem; line-height: 1.75;
+}
+.narrative p { margin-bottom: 0.75rem; }
+.narrative p:last-child { margin-bottom: 0; }
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem;
+  color: var(--muted); text-align: center;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Strata / CIS</span>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="schema.html">Schema</a>
+    <a href="policies.html">Policies</a>
+    <a href="roles.html">Roles</a>
+    <a href="bylaws.html">Bylaws</a>
+    <a href="migrations.html" class="active">Migrations</a>
+    <button class="theme-toggle" onclick="toggleTheme()">◐</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Migration History — Wave Progression</div>
+    <h1>How the substrate<br>was laid down</h1>
+    <p class="hero-sub">
+      Geological strata form in sequence — each layer deposited on the one before it, each
+      containing a record of what lived and what changed. The CIS migrations are the same:
+      an ordered sequence of commitments, each building on the last, each permanent once applied.
+    </p>
+    <div class="hero-meta">
+      3 migrations applied &nbsp;·&nbsp; W0 active &nbsp;·&nbsp;
+      <span>W1 – W6 planned</span>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-chip"><span class="num">3</span>applied</div>
+    <div class="stat-chip"><span class="num">W0</span>current wave</div>
+    <div class="stat-chip"><span class="num">6</span>planned waves</div>
+    <div class="stat-chip"><span class="num">2026-05-22</span>substrate date</div>
+    <div class="stat-chip"><span class="num">0</span>reversals</div>
+  </div>
+
+  <!-- WAVE PROGRESS BAR -->
+  <div class="wave-track">
+    <div class="wave-node active">
+      <span class="wave-pip"></span>
+      <span class="wave-num">W0</span>
+      <span class="wave-label">Substrate</span>
+    </div>
+    <div class="wave-node">
+      <span class="wave-pip"></span>
+      <span class="wave-num">W1</span>
+      <span class="wave-label">Capital</span>
+    </div>
+    <div class="wave-node">
+      <span class="wave-pip"></span>
+      <span class="wave-num">W2</span>
+      <span class="wave-label">Hub Ops</span>
+    </div>
+    <div class="wave-node">
+      <span class="wave-pip"></span>
+      <span class="wave-num">W3</span>
+      <span class="wave-label">Mercury</span>
+    </div>
+    <div class="wave-node">
+      <span class="wave-pip"></span>
+      <span class="wave-num">W4</span>
+      <span class="wave-label">Voting</span>
+    </div>
+    <div class="wave-node">
+      <span class="wave-pip"></span>
+      <span class="wave-num">W5</span>
+      <span class="wave-label">Onchain</span>
+    </div>
+    <div class="wave-node">
+      <span class="wave-pip"></span>
+      <span class="wave-num">W6</span>
+      <span class="wave-label">Exit-ready</span>
+    </div>
+  </div>
+
+  <div class="narrative">
+    <p>
+      A geological layer cannot be unwritten. Once sediment is deposited, it is part of the record —
+      even if later layers cover it. The CIS migrations work the same way. No migration is ever
+      reversed; no schema object is dropped; no row is hard-deleted. Every change that has been
+      applied is part of the permanent record of what the cooperative's information system was,
+      and when it became that way.
+    </p>
+    <p>
+      The wave progression is not a project plan — it is a phenological calendar, a record of
+      what grows in what season. W0 is the soil preparation: extensions, schema, types, triggers,
+      the bootstrap agents. W1 is the first growth: capital accounts, patronage tracking. Each
+      subsequent wave depends entirely on what came before. Nothing skips.
+    </p>
+  </div>
+
+  <!-- APPLIED MIGRATIONS -->
+  <div class="section-header">
+    <h2>Applied Migrations</h2>
+    <span class="count">3 migrations · Wave 0</span>
+  </div>
+
+  <div class="migration-card applied">
+    <div class="migration-header">
+      <span class="migration-id">20260522000000_L1-L2-substrate.sql</span>
+      <span class="badge badge-applied">APPLIED</span>
+    </div>
+    <div class="migration-title">L1 + L2 Substrate — Schema Foundation</div>
+    <div class="migration-desc">
+      Laid the bedrock. Extensions, schemas, enumerated types, all five public tables,
+      the audit schema with its append-only trigger, the export schema for read-only views.
+      Three bootstrap agent rows inserted: the cooperative itself, Nou, and Dianoia.
+    </div>
+    <div class="migration-detail">
+      <div class="detail-chip"><span class="detail-label">Date</span><span class="detail-val">2026-05-22</span></div>
+      <div class="detail-chip"><span class="detail-label">Lines</span><span class="detail-val">606</span></div>
+      <div class="detail-chip"><span class="detail-label">Wave</span><span class="detail-val">W0 · Substrate</span></div>
+      <div class="detail-chip"><span class="detail-label">Tables created</span><span class="detail-val">5 + audit.events</span></div>
+      <div class="detail-chip"><span class="detail-label">Agents seeded</span><span class="detail-val">3</span></div>
+      <div class="detail-chip"><span class="detail-label">Extensions</span><span class="detail-val">uuid-ossp · citext · vector</span></div>
+    </div>
+    <div class="migration-introduces">
+      <div class="introduces-label">Introduced</div>
+      <div class="introduces-list">
+        <span class="intro-tag">public.agents</span>
+        <span class="intro-tag">public.agreements</span>
+        <span class="intro-tag">public.agreement_sections</span>
+        <span class="intro-tag">public.resources</span>
+        <span class="intro-tag">public.role_assignments</span>
+        <span class="intro-tag">audit.events</span>
+        <span class="intro-tag">audit.log_change() trigger</span>
+        <span class="intro-tag">export schema</span>
+        <span class="intro-tag">agent_kind enum</span>
+        <span class="intro-tag">resource_kind enum</span>
+        <span class="intro-tag">agreement_kind enum</span>
+        <span class="intro-tag">RegenHub LCA agent row</span>
+        <span class="intro-tag">Nou agent row</span>
+        <span class="intro-tag">Dianoia agent row</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="migration-card applied">
+    <div class="migration-header">
+      <span class="migration-id">20260522000001_phase2-rls-policies.sql</span>
+      <span class="badge badge-applied">APPLIED</span>
+    </div>
+    <div class="migration-title">Phase 2 — Row-Level Security (Cite-as-You-Enforce)</div>
+    <div class="migration-desc">
+      The membrane layer. RLS enabled on all six tables. Twenty-eight policies written with
+      bylaw citations. Three SECURITY DEFINER helper functions. The default-deny posture
+      made permanent — a row not matched by a permissive policy is invisible.
+    </div>
+    <div class="migration-detail">
+      <div class="detail-chip"><span class="detail-label">Date</span><span class="detail-val">2026-05-22</span></div>
+      <div class="detail-chip"><span class="detail-label">Lines</span><span class="detail-val">577</span></div>
+      <div class="detail-chip"><span class="detail-label">Wave</span><span class="detail-val">W0 · Substrate</span></div>
+      <div class="detail-chip"><span class="detail-label">Policies</span><span class="detail-val">28</span></div>
+      <div class="detail-chip"><span class="detail-label">Helper fns</span><span class="detail-val">3</span></div>
+      <div class="detail-chip"><span class="detail-label">DELETE policies</span><span class="detail-val">0</span></div>
+    </div>
+    <div class="migration-introduces">
+      <div class="introduces-label">Introduced</div>
+      <div class="introduces-list">
+        <span class="intro-tag">RLS enabled (6 tables)</span>
+        <span class="intro-tag">has_role()</span>
+        <span class="intro-tag">has_any_role()</span>
+        <span class="intro-tag">agent_id()</span>
+        <span class="intro-tag">cite-as-you-enforce discipline</span>
+        <span class="intro-tag">default-deny posture</span>
+        <span class="intro-tag">28 SELECT/INSERT/UPDATE policies</span>
+        <span class="intro-tag">no DELETE policy (by design)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="migration-card applied">
+    <div class="migration-header">
+      <span class="migration-id">20260522000002_bylaws-v2-seed.sql</span>
+      <span class="badge badge-applied">APPLIED</span>
+    </div>
+    <div class="migration-title">L3 Bylaws — v2 Ingestion (Stable-Addressed Sections)</div>
+    <div class="migration-desc">
+      The living document layer. The full Bylaws v2 text ingested as stable-addressed
+      agreement_sections rows. Each section carries a stable address that survives
+      renumbering and amendments. Every RLS policy citation resolves to a row in this table.
+      Idempotent — ON CONFLICT DO UPDATE; safe to re-run.
+    </div>
+    <div class="migration-detail">
+      <div class="detail-chip"><span class="detail-label">Date</span><span class="detail-val">2026-05-22</span></div>
+      <div class="detail-chip"><span class="detail-label">Wave</span><span class="detail-val">W0 · Substrate</span></div>
+      <div class="detail-chip"><span class="detail-label">Agreement rows</span><span class="detail-val">1</span></div>
+      <div class="detail-chip"><span class="detail-label">Articles</span><span class="detail-val">18</span></div>
+      <div class="detail-chip"><span class="detail-label">Status</span><span class="detail-val">draft (blocking issues: 2)</span></div>
+      <div class="detail-chip"><span class="detail-label">Idempotent</span><span class="detail-val">yes — ON CONFLICT UPDATE</span></div>
+    </div>
+    <div class="migration-introduces">
+      <div class="introduces-label">Introduced</div>
+      <div class="introduces-list">
+        <span class="intro-tag">Bylaws v2 agreement row</span>
+        <span class="intro-tag">Preamble</span>
+        <span class="intro-tag">Articles I – XVIII</span>
+        <span class="intro-tag">bylaws:v2:* address space</span>
+        <span class="intro-tag">stable address format</span>
+        <span class="intro-tag">superseded_by chain (ready)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE ROADMAP -->
+  <div class="section-header">
+    <h2>Wave Roadmap</h2>
+    <span class="count">W0 active · W1–W6 planned</span>
+  </div>
+
+  <div class="wave-card active-wave">
+    <div class="wave-card-header">
+      <span class="wave-id">W0</span>
+      <span class="wave-name">Substrate <span class="badge badge-active">ACTIVE</span></span>
+    </div>
+    <div class="wave-desc">
+      The foundational layer. Schema, types, triggers, RLS, bylaws text.
+      The cooperative's information system exists as a defined structure.
+      Three agents bootstrapped. Twenty-eight access policies govern every row.
+    </div>
+    <div class="wave-migrations">
+      <span class="wave-mig">20260522000000_L1-L2-substrate</span>
+      <span class="wave-mig">20260522000001_phase2-rls-policies</span>
+      <span class="wave-mig">20260522000002_bylaws-v2-seed</span>
+    </div>
+  </div>
+
+  <div class="wave-card planned-wave">
+    <div class="wave-card-header">
+      <span class="wave-id">W1</span>
+      <span class="wave-name">Capital <span class="badge badge-planned">PLANNED</span></span>
+    </div>
+    <div class="wave-desc">
+      Patronage accounting module. Capital accounts populated from contributions.
+      The six patronage primitives (HOURS · REVENUE · CASH · OUTPUT · PRESENCE · PROPERTY)
+      tracked as resource events. Year-end allocation engine. K-1 preparation support.
+      IRC 704(b) compliance checks. No-phantom-tax distribution logic.
+    </div>
+    <div class="wave-migrations">
+      <span class="wave-mig">W1 migrations · not yet authored</span>
+    </div>
+  </div>
+
+  <div class="wave-card planned-wave">
+    <div class="wave-card-header">
+      <span class="wave-id">W2</span>
+      <span class="wave-name">Hub Operations <span class="badge badge-planned">PLANNED</span></span>
+    </div>
+    <div class="wave-desc">
+      Hub membership layer. Hub Member Agreement ingestion. ee_liaison KPI views
+      (aggregate resource reads — no individual rows). Hub-specific role grants and
+      access policies for coworking members, visitors, and the EE liaison role.
+      Space revenue tracking integrated with capital accounts.
+    </div>
+    <div class="wave-migrations">
+      <span class="wave-mig">W2 migrations · not yet authored</span>
+    </div>
+  </div>
+
+  <div class="wave-card planned-wave">
+    <div class="wave-card-header">
+      <span class="wave-id">W3</span>
+      <span class="wave-name">Mercury / Messaging <span class="badge badge-planned">PLANNED</span></span>
+    </div>
+    <div class="wave-desc">
+      Inter-agent communication layer. Message threading, inbox management,
+      presence signals. Enables Nou's coordination infrastructure to be
+      formally captured in the CIS rather than in external tables.
+      Agent-to-agent messages become first-class events in the audit stream.
+    </div>
+    <div class="wave-migrations">
+      <span class="wave-mig">W3 migrations · not yet authored</span>
+    </div>
+  </div>
+
+  <div class="wave-card planned-wave">
+    <div class="wave-card-header">
+      <span class="wave-id">W4</span>
+      <span class="wave-name">Voting Infrastructure <span class="badge badge-planned">PLANNED</span></span>
+    </div>
+    <div class="wave-desc">
+      Democratic governance machinery. Motions, proposals, voting records.
+      Quorum calculations based on live role_assignments. One member, one vote
+      enforced at the data layer. Integration with family meetings (1st and 3rd
+      Fridays). Ratification events write to audit.events.
+    </div>
+    <div class="wave-migrations">
+      <span class="wave-mig">W4 migrations · not yet authored</span>
+    </div>
+  </div>
+
+  <div class="wave-card planned-wave">
+    <div class="wave-card-header">
+      <span class="wave-id">W5</span>
+      <span class="wave-name">Onchain Identity <span class="badge badge-planned">PLANNED</span></span>
+    </div>
+    <div class="wave-desc">
+      ERC-8004 agent registration, ENS linkage, onchain governance hooks.
+      Nou's onchain identity (Agent ID 2202 · nou.habitat.eth) formalized
+      in the CIS. CLOUD credit integration. Cross-chain attestation for
+      cooperative membership status.
+    </div>
+    <div class="wave-migrations">
+      <span class="wave-mig">W5 migrations · not yet authored</span>
+    </div>
+  </div>
+
+  <div class="wave-card planned-wave">
+    <div class="wave-card-header">
+      <span class="wave-id">W6</span>
+      <span class="wave-name">Exit-Ready <span class="badge badge-planned">PLANNED</span></span>
+    </div>
+    <div class="wave-desc">
+      Full cooperative lifecycle support. Member exit flows, share redemption,
+      capital account payout scheduling (up to 5 years per bylaws). Dissolution
+      procedures. Data portability — a departing member can export their full
+      history. The cooperative can run itself cleanly from formation to wind-down.
+    </div>
+    <div class="wave-migrations">
+      <span class="wave-mig">W6 migrations · not yet authored</span>
+    </div>
+  </div>
+
+  <!-- MIGRATION INVARIANTS -->
+  <div class="section-header">
+    <h2>Invariants</h2>
+    <span class="count">rules that never change</span>
+  </div>
+
+  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:0.75rem; margin-bottom:2rem;">
+    <div style="background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:1rem;">
+      <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--purple); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.08em;">No Reversals</div>
+      <div style="font-size:0.88rem;">Migrations are never reversed. Schema objects are never dropped. The substrate is permanent.</div>
+    </div>
+    <div style="background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:1rem;">
+      <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--purple); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.08em;">Append-Only Data</div>
+      <div style="font-size:0.88rem;">No hard deletes. State changes are UPDATE (setting archived_at or revoked_at). The audit trigger records every change.</div>
+    </div>
+    <div style="background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:1rem;">
+      <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--purple); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.08em;">Cite-as-You-Enforce</div>
+      <div style="font-size:0.88rem;">Every RLS policy carries a bylaw citation. Schema and governance stay coupled by design, not convention.</div>
+    </div>
+    <div style="background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:1rem;">
+      <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--purple); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.08em;">Wave Sequential</div>
+      <div style="font-size:0.88rem;">Each wave depends entirely on what came before. No wave can be skipped. No migration assumes a future state.</div>
+    </div>
+    <div style="background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:1rem;">
+      <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--purple); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.08em;">Idempotent Seeds</div>
+      <div style="font-size:0.88rem;">Seed migrations use ON CONFLICT DO UPDATE. Safe to re-run without corrupting state.</div>
+    </div>
+    <div style="background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:1rem;">
+      <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--purple); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.08em;">Service Role Only</div>
+      <div style="font-size:0.88em;">Migrations run as the Supabase service role, which bypasses RLS. The service key is never exposed to client code.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Strata / CIS Reference &nbsp;·&nbsp; RegenHub, LCA &nbsp;·&nbsp;
+  <a href="index.html">Overview</a> &nbsp;·&nbsp;
+  <a href="https://techne.coop/legal" target="_blank">Legal</a>
+  &nbsp;·&nbsp; W0 · construction zone
+</footer>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem('strata-theme', html.dataset.theme); } catch(e) {}
+}
+try {
+  const t = localStorage.getItem('strata-theme');
+  if (t) document.documentElement.dataset.theme = t;
+} catch(e) {}
+</script>
+</body>
+</html>
